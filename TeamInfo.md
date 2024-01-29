@@ -1,4 +1,4 @@
-# team000-sample
+# team049-SuperDB
 
 ## Basic Information
 
@@ -6,14 +6,14 @@
 | -------- | --------------------- |
 | TeamID   | Team-049              |
 | TeamName | SuperDB               |
-| Captain  |                       |
-| Captain  |                       |
-| Member1  |                       |
+| Captain  | Vincent Lyu           |
+| Captain  | vlyu2@illinois.edu    |
+| Member1  | Kathy Lo              |
 | Member1  | kathylo2@illinois.edu |
-| Member2  | Vincent Lyu           |
-| Member2  | vlyu2@illinois.edu    |
-| Member3  |                       |
-| Member3  | zilinz4@illinois.edu  |
+| Member2  | Zilin Zhou            |
+| Member2  | zilinz4@illinois.edu  |
+| Member3  | Yu Tian               |
+| Member3  | yut5@illinois.edu     |
 
 ## Project Information
 
