@@ -25,4 +25,4 @@
 
 ## Project Summary
 
-This is a summary of the project!
+NextHousing is a comprehensive web platform tailored for students and young professionals, aiming to transform the often daunting task of finding the ideal living space into a streamlined, enjoyable experience. Recognizing the unique challenges and preferences of this demographic, NextHousing aggregates a comprehensive array of rental listings and enriches them with in-depth insights, user-generated reviews, and real-time data on critical living factors such as neighborhood safety, amenities, and cost of living. Our intuitive interface simplifies the search and comparison process, enabling users to make informed housing decisions efficiently and stress-free.
