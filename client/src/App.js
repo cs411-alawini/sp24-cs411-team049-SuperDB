@@ -19,9 +19,17 @@ const listings = [
     title: "Icon Apartment",
     address: "309 E Springfield Ave, Champaign, IL 61820",
     price: 1850,
-    imageUrl: "https://lh3.googleusercontent.com/p/AF1QipOwn4Z-sKZmtfF0y-ZYcqKoFB3w_7ubmBpVKoGV=s680-w680-h510", // 替换为房产图片的URL
+    imageUrl: "https://images1.apartments.com/i2/8iVWI77Npzj1eSM9GPJkGpoEjdDoL3lVq1yYtDuE64w/111/icon---brand-new-champaign-il-primary-photo.jpg", // 替换为房产图片的URL
     lat: 40.11291900531373,
     lng: -88.23440746931675
+  },
+    {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
   },
   // ...更多房产数据
 ];
