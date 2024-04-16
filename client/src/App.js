@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container } from '@mui/material';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, MarkerF } from '@react-google-maps/api';
+
 
 const mapStyles = {
   width: '100%',
@@ -19,8 +20,8 @@ const listings = [
     address: "309 E Springfield Ave, Champaign, IL 61820",
     price: 1850,
     imageUrl: "https://lh3.googleusercontent.com/p/AF1QipOwn4Z-sKZmtfF0y-ZYcqKoFB3w_7ubmBpVKoGV=s680-w680-h510", // 替换为房产图片的URL
-    lat: 42.3765,
-    lng: -72.5132
+    lat: 40.11291900531373,
+    lng: -88.23440746931675
   },
   // ...更多房产数据
 ];
@@ -72,10 +73,13 @@ function App() {
             <GoogleMap
               mapContainerStyle={mapStyles}
               center={defaultCenter}
-              zoom={13}
+              zoom={14}
             >
               {listings.map((listing, index) => (
-                <Marker key={index} position={{ lat: listing.lat, lng: listing.lng }} />
+                <MarkerF 
+                  key={index}
+                  position={{ lat: listing.lat, lng: listing.lng }}
+                />
               ))}
             </GoogleMap>
           </LoadScript>
