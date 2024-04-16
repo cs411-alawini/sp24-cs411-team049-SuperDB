@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container } from '@mui/material';
-import { GoogleMap, LoadScript, MarkerF } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 
 
 const mapStyles = {
@@ -27,6 +27,15 @@ const listings = [
 ];
 
 function App() {
+  const [activeMarker, setActiveMarker] = useState(null);
+
+  // 处理Marker悬停事件
+  const handleActiveMarker = (marker) => {
+    if (marker === activeMarker) {
+      return;
+    }
+    setActiveMarker(marker);
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="default">
@@ -79,7 +88,20 @@ function App() {
                 <MarkerF 
                   key={index}
                   position={{ lat: listing.lat, lng: listing.lng }}
-                />
+                  onMouseOver={() => handleActiveMarker(index)} // 当鼠标悬停时设置激活的Marker
+                  onMouseOut={() => handleActiveMarker(null)} // 当鼠标离开时关闭信息窗口
+                >
+                                  {/* 如果当前marker是激活的，显示InfoWindow */}
+                {activeMarker === index ? (
+                  <InfoWindowF onCloseClick={() => setActiveMarker(null)}>
+                    <Box>
+                      <Typography variant="subtitle2">{listing.title}</Typography>
+                      <Typography variant="body2">{listing.address}</Typography>
+                      <Typography variant="body2">{`$${listing.price} / month`}</Typography>
+                    </Box>
+                  </InfoWindowF>
+                ) : null}
+              </MarkerF>
               ))}
             </GoogleMap>
           </LoadScript>
