@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mysql://34.162.8.251:3306/next_housing?useSSL=false
+    username: root
+    password: "'an{QRn%;m{+<zHd"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  liquibase:
+    enabled: false
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.housing.entity
+server:
+  port: 8081
