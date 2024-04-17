@@ -1,6 +1,7 @@
 package com.housing.service.impl;
 
 import com.housing.entity.PropertyEntity;
+import com.housing.entity.PropertyModel;
 import com.housing.mapper.PropertyMapper;
 import com.housing.service.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class PropertyServiceImpl implements PropertyService {
     private PropertyMapper propertyMapper;
 
     @Override
-    public List<PropertyEntity> getPropertiesInRectangle(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
-        return propertyMapper.findPropertiesInRectangle(minLatitude, maxLatitude, minLongitude, maxLongitude);
+    public List<PropertyModel> getPropertiesInRectangle(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
+        return propertyMapper.findAllPropertiesWithFloorPlans(minLatitude, maxLatitude, minLongitude, maxLongitude);
     }
 }
