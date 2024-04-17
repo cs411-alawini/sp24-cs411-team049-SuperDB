@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 
 
@@ -36,7 +36,7 @@ const listings = [
 
 function App() {
   const [activeMarker, setActiveMarker] = useState(null);
-
+  
   // 处理Marker悬停事件
   const handleActiveMarker = (marker) => {
     if (marker === activeMarker) {
@@ -44,6 +44,18 @@ function App() {
     }
     setActiveMarker(marker);
   };
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+
+  const handleLoginClick = () => {
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="default">
@@ -51,7 +63,8 @@ function App() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             NextHousing
           </Typography>
-          <Button color="inherit">LOGIN</Button>
+          <Button color="inherit" onClick={handleLoginClick}>LOGIN</Button>
+          <LoginDialog open={dialogOpen} onClose={handleDialogClose} />
         </Toolbar>
       </AppBar>
       <Box sx={{ width: '100%', backgroundColor: 'white' }}>
@@ -126,6 +139,91 @@ function App() {
   );
   
 }
+
+function LoginDialog({ open, onClose }) {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // 用于注册的邮箱状态
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // 确认密码状态
+  const [isLogin, setIsLogin] = useState(true);
+
+  const handleLogin = () => {
+    // 登录逻辑...
+    onClose();
+  };
+
+  const handleRegister = () => {
+    // 注册逻辑...
+    // 在这里你可能想检查密码和确认密码是否匹配
+    // 以及是否输入了有效的邮箱
+    onClose();
+  };
+
+  const toggleForm = () => {
+    setIsLogin(!isLogin);
+    // 切换表单时清空所有字段
+    setUsername('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>{isLogin ? 'Login' : 'Register'}</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Username"
+          type="text"
+          fullWidth
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        {!isLogin && (
+          <TextField
+            margin="dense"
+            label="Email"
+            type="email"
+            fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        )}
+        <TextField
+          margin="dense"
+          label="Password"
+          type="password"
+          fullWidth
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {!isLogin && (
+          <TextField
+            margin="dense"
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={isLogin ? handleLogin : handleRegister}>
+          {isLogin ? 'Login' : 'Register'}
+        </Button>
+        <Button color="primary" onClick={toggleForm}>
+          {isLogin ? 'Register' : 'Have an account? Login'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+
 function Dropdown({ label }) {
   return (
     <FormControl fullWidth>
