@@ -1,7 +1,10 @@
 package com.housing.model;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class ListingModel {
 
     private int listingID;
