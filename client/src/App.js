@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
-
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 const mapStyles = {
   width: '100%',
@@ -98,7 +98,7 @@ function App() {
         </Container>
       </Box>
       <Grid container>
-        <Grid item xs={12} md={9}>
+        <Grid item xs={12} md={8}>
           <LoadScript googleMapsApiKey="AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg">
             <GoogleMap
               mapContainerStyle={mapStyles}
@@ -127,12 +127,12 @@ function App() {
             </GoogleMap>
           </LoadScript>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ maxHeight: '100vh', overflow: 'auto' }}>
+        <Grid item xs={12} md={4} sx={{ overflow: 'auto' }}>
+          <Grid container spacing={2} sx={{ padding: 2 }}>
             {listings.map((listing, index) => (
               <ListingCard key={index} {...listing} />
             ))}
-          </Paper>
+          </Grid>
         </Grid>
       </Grid>
     </Box>
@@ -237,30 +237,59 @@ function Dropdown({ label }) {
 }
 
 
-function ListingCard({ title, address, price, imageUrl }) {
+function ListingCard({ title, address, price, imageUrl, isFavourite = false}) {
+  // 定义卡片和媒体部分的样式
+  const cardStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: 400, // 可以调整为所需的固定高度
+    margin: '8px'
+  };
+
+  const mediaStyle = {
+    height: '60%', // 图片高度占卡片的60%
+  };
+
+  const handleFavouriteClick = () => {
+    // 这里你可以添加逻辑来更新用户的收藏状态
+    console.log(`${title} is favourited: ${!isFavourite}`);
+  };
+
   return (
-    <Card sx={{ display: 'flex', marginBottom: 2 }}>
-      <CardMedia
-        component="img"
-        sx={{ width: 151 }}
-        image={imageUrl}
-        alt="House"
-      />
-      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-        <CardContent sx={{ flex: '1 0 auto' }}>
-          <Typography component="div" variant="h6">
-            {title}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary" component="div">
+    <Grid item xs={12} sm={6} md={6} lg={6}>
+      <Card sx={cardStyle}>
+        <CardMedia
+          component="img"
+          sx={mediaStyle}
+          image={imageUrl}
+          alt="House"
+        />
+        <CardContent>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography gutterBottom variant="h6" component="div">
+              {title}
+            </Typography>
+            <IconButton onClick={handleFavouriteClick}>
+              <FavoriteBorderIcon color={isFavourite ? "error" : "action"} />
+            </IconButton>
+          </Box>
+          <Typography variant="body2" color="text.secondary">
             {address}
           </Typography>
-          <Typography variant="body1" component="div">
+          <Typography variant="body1">
             {`$${price} / month`}
           </Typography>
         </CardContent>
-      </Box>
-    </Card>
+        <CardActions>
+          <Button size="small" color="primary">Email Property</Button>
+          <Button size="small" color="primary">Call</Button>
+        </CardActions>
+      </Card>
+    </Grid>
   );
 }
+
+
 
 export default App;
