@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Grid, Pagination , Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 const mapStyles = {
   width: '100%',
-  height: '100vh'
+  height: 'calc(100vh - 64px)'
 };
 
 const defaultCenter = {
@@ -23,7 +23,7 @@ const listings = [
     lat: 40.11291900531373,
     lng: -88.23440746931675
   },
-    {
+  {
     title: "The Dean Campustown",
     address: "102 E Green St, Champaign, IL 61820",
     price: 1850,
@@ -31,12 +31,97 @@ const listings = [
     lat: 40.1065968,
     lng: -88.2330653
   },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+  {
+    title: "The Dean Campustown",
+    address: "102 E Green St, Champaign, IL 61820",
+    price: 1850,
+    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
+    lat: 40.1065968,
+    lng: -88.2330653
+  },
+
   // ...更多房产数据
 ];
 
 function App() {
   const [activeMarker, setActiveMarker] = useState(null);
-  
+  // 翻页相关
+  const [currentPage, setCurrentPage] = useState(1);
+  const listingsPerPage = 10;
+  const indexOfLastListing = currentPage * listingsPerPage;
+  const indexOfFirstListing = indexOfLastListing - listingsPerPage;
+  const currentListings = listings.slice(indexOfFirstListing, indexOfLastListing);
+
+  const handleChangePage = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const totalPages = Math.ceil(listings.length / listingsPerPage);
+
   // 处理Marker悬停事件
   const handleActiveMarker = (marker) => {
     if (marker === activeMarker) {
@@ -57,7 +142,7 @@ function App() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <AppBar position="static" color="default">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -67,74 +152,74 @@ function App() {
           <LoginDialog open={dialogOpen} onClose={handleDialogClose} />
         </Toolbar>
       </AppBar>
-      <Box sx={{ width: '100%', backgroundColor: 'white' }}>
-        <Container maxWidth={false}>
-          <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12} sm={2}>
-              <Dropdown label="Campus or Town" />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Price" />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Dropdown label="Pricing Type" />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Beds & Baths" />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Building Type" />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="More" />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="Search" variant="outlined" />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Sort" />
-            </Grid>
+      <Container maxWidth={false} sx={{ paddingY: 1 }}>
+        <Grid container spacing={1} alignItems="center">
+          <Grid item xs={12} sm={2}>
+            <Dropdown label="Campus or Town" />
           </Grid>
-        </Container>
-      </Box>
-      <Grid container>
-        <Grid item xs={12} md={8}>
-          <LoadScript googleMapsApiKey="AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg">
-            <GoogleMap
-              mapContainerStyle={mapStyles}
-              center={defaultCenter}
-              zoom={14}
-            >
-              {listings.map((listing, index) => (
-                <MarkerF 
-                  key={index}
-                  position={{ lat: listing.lat, lng: listing.lng }}
-                  onMouseOver={() => handleActiveMarker(index)} // 当鼠标悬停时设置激活的Marker
-                  onMouseOut={() => handleActiveMarker(null)} // 当鼠标离开时关闭信息窗口
-                >
-                                  {/* 如果当前marker是激活的，显示InfoWindow */}
-                {activeMarker === index ? (
-                  <InfoWindowF onCloseClick={() => setActiveMarker(null)}>
-                    <Box>
-                      <Typography variant="subtitle2">{listing.title}</Typography>
-                      <Typography variant="body2">{listing.address}</Typography>
-                      <Typography variant="body2">{`$${listing.price} / month`}</Typography>
-                    </Box>
-                  </InfoWindowF>
-                ) : null}
-              </MarkerF>
+          <Grid item xs={12} sm={1}>
+            <Dropdown label="Price" />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <Dropdown label="Pricing Type" />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <Dropdown label="Beds & Baths" />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <Dropdown label="Building Type" />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <Dropdown label="More" />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <TextField fullWidth label="Search" variant="outlined" />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <Dropdown label="Sort" />
+          </Grid>
+        </Grid>
+      </Container>
+      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+        <Grid container sx={{ height: '100%', maxHeight: '100%' }}>
+          <Grid item xs={12} md={8} sx={{ height: '100%' }}>
+            <LoadScript googleMapsApiKey="AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg">
+              <GoogleMap
+                mapContainerStyle={mapStyles}
+                center={defaultCenter}
+                zoom={14}
+              >
+                {listings.map((listing, index) => (
+                  <MarkerF
+                    key={index}
+                    position={{ lat: listing.lat, lng: listing.lng }}
+                    onMouseOver={() => handleActiveMarker(index)}
+                    onMouseOut={() => handleActiveMarker(null)}
+                  >
+                    {activeMarker === index ? (
+                      <InfoWindowF onCloseClick={() => setActiveMarker(null)}>
+                        <Box>
+                          <Typography variant="subtitle2">{listing.title}</Typography>
+                          <Typography variant="body2">{listing.address}</Typography>
+                          <Typography variant="body2">{`$${listing.price} / month`}</Typography>
+                        </Box>
+                      </InfoWindowF>
+                    ) : null}
+                  </MarkerF>
+                ))}
+              </GoogleMap>
+            </LoadScript>
+          </Grid>
+          <Grid item xs={12} md={4} sx={{ height: '100%', overflowY: 'auto' }}>
+            <Grid container spacing={2} sx={{ padding: 2 }}>
+              {currentListings.map((listing, index) => (
+                <ListingCard key={index} {...listing} />
               ))}
-            </GoogleMap>
-          </LoadScript>
-        </Grid>
-        <Grid item xs={12} md={4} sx={{ overflow: 'auto' }}>
-          <Grid container spacing={2} sx={{ padding: 2 }}>
-            {listings.map((listing, index) => (
-              <ListingCard key={index} {...listing} />
-            ))}
+            </Grid>
+            <Pagination count={totalPages} page={currentPage} onChange={handleChangePage} />
           </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </Box>
   );
   
