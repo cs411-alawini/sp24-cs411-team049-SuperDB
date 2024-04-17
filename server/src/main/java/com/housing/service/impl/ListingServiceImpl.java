@@ -2,7 +2,7 @@ package com.housing.service.impl;
 
 
 import com.housing.mapper.ListingMapper;
-import com.housing.model.ListingModel;
+import com.housing.entity.ListingModel;
 import com.housing.service.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

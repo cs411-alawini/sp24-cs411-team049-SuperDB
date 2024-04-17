@@ -1,6 +1,6 @@
 package com.housing.mapper;
 
-import com.housing.model.ListingModel;
+import com.housing.entity.ListingModel;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

@@ -1,9 +1,12 @@
 package com.housing.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "Favorites")
 public class FavoriteEntity {

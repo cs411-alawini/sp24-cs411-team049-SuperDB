@@ -1,4 +1,4 @@
-package com.housing.model;
+package com.housing.entity;
 
 import lombok.Data;
 
