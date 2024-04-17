@@ -1,6 +1,7 @@
 package com.housing.controller;
 
 import com.housing.entity.PropertyEntity;
+import com.housing.entity.PropertyModel;
 import com.housing.service.PropertyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,10 @@ public class PropertyController {
     private PropertyService propertyService;
 
     @GetMapping("/properties/inRectangle")
-    public List<PropertyEntity> getPropertiesInRectangle(@RequestParam double minLatitude,
-                                                         @RequestParam double maxLatitude,
-                                                         @RequestParam double minLongitude,
-                                                         @RequestParam double maxLongitude) {
+    public List<PropertyModel> getPropertiesInRectangle(@RequestParam double minLatitude,
+                                                        @RequestParam double maxLatitude,
+                                                        @RequestParam double minLongitude,
+                                                        @RequestParam double maxLongitude) {
         return propertyService.getPropertiesInRectangle(minLatitude, maxLatitude, minLongitude, maxLongitude);
     }
 }
