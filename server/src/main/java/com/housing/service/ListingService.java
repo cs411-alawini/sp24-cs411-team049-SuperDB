@@ -1,6 +1,6 @@
 package com.housing.service;
 
-import com.housing.model.ListingModel;
+import com.housing.entity.ListingModel;
 import java.util.List;
 
 public interface ListingService {
