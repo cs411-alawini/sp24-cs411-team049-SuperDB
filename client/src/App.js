@@ -401,6 +401,11 @@ function ListingCard({ listing }) {
   // 获取价格范围描述
   const priceRange = getPriceRange(floorPlans);
 
+  const handleFavouriteClick = () => {
+    // 这里你可以添加逻辑来更新用户的收藏状态
+    console.log(`${title} is favourited:`);
+  };
+
   // 默认图片地址
   const defaultImageUrl = `${process.env.PUBLIC_URL}/images/default.png`;
   const mediaStyle = {
@@ -418,9 +423,15 @@ function ListingCard({ listing }) {
           alt="Apartment"
         />
         <CardContent>
-          <Typography gutterBottom variant="h7" component="div">
-            {title}
-          </Typography>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography gutterBottom variant="h7" component="div">
+              {title}
+            </Typography>
+            <IconButton onClick={handleFavouriteClick}>
+                {/* Dummy icon */}
+                <FavoriteBorderIcon color={false ? "error" : "action"} />
+            </IconButton>
+          </Box>
           <Typography variant="body2" color="text.secondary">
             {address || "Fetching address..."}
           </Typography>
