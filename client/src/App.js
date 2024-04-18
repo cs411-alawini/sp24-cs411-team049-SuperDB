@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, Grid, Paper, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Grid, Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+
+import axios from 'axios';
 
 const mapStyles = {
   width: '100%',
@@ -156,7 +158,20 @@ function LoginDialog({ open, onClose }) {
     // 注册逻辑...
     // 在这里你可能想检查密码和确认密码是否匹配
     // 以及是否输入了有效的邮箱
-    onClose();
+    const userData = {
+      username,
+      email,
+      password
+    };
+
+    axios.post('http://your-backend-url/register', userData)
+    .then(response => {
+      console.log(response.data);
+      onClose();
+    })
+    .catch(error => {
+      console.error('There was an error registering the user:', error);
+    });
   };
 
   const toggleForm = () => {
