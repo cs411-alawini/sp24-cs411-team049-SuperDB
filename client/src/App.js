@@ -128,11 +128,34 @@ function App() {
     fetchListings(latLngBounds);
   };
 
-  const fetchListings = async (bounds) => {
-    const url = `/housing/property/properties/inRectangle?minLatitude=${bounds.minLatitude}&maxLatitude=${bounds.maxLatitude}&minLongitude=${bounds.minLongitude}&maxLongitude=${bounds.maxLongitude}`;
+  const fetchAddress = async (latitude, longitude) => {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg`;
     const response = await fetch(url);
     const data = await response.json();
-    setListings(data);
+    return data.results[0]?.formatted_address || "Address not found";
+  };
+
+  const fetchListings = async (bounds) => {
+    const url = `/housing/property/properties/inRectangle?minLatitude=${bounds.minLatitude}&maxLatitude=${bounds.maxLatitude}&minLongitude=${bounds.minLongitude}&maxLongitude=${bounds.maxLongitude}`;
+    
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      // 创建一个新的数组来保存包含地址信息的房产列表
+      const updatedListings = await Promise.all(data.map(async (listing) => {
+        // 如果房产对象没有地址信息，则调用 fetchAddress 函数获取
+        if (!listing.address) {
+          listing.address = await fetchAddress(listing.latitude, listing.longitude);
+        }
+        return listing;
+      }));
+      
+      setListings(updatedListings);
+    } catch (error) {
+      console.error("Failed to fetch listings:", error);
+      // 处理错误，可能是设置一个状态来显示错误信息
+    }
   };
 
   const listingsPerPage = 10;
@@ -220,7 +243,7 @@ function App() {
           <Grid item xs={12} md={4} sx={{ height: '100%', overflowY: 'auto' }}>
             <Grid container spacing={2} sx={{ padding: 2 }}>
               {currentListings.map((listing, index) => (
-                <ListingCard key={index} {...listing} />
+                <ListingCard key={index} listing={listing} />
               ))}
             </Grid>
             <Pagination count={totalPages} page={currentPage} onChange={handleChangePage} />
@@ -329,53 +352,78 @@ function Dropdown({ label }) {
 }
 
 
-function ListingCard({ title, address, price, imageUrl, isFavourite = false}) {
-  // 定义卡片和媒体部分的样式
-  const cardStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    height: 400, // 可以调整为所需的固定高度
-    margin: '8px'
+function ListingCard({ listing }) {
+  // 解构必要的属性
+  const {
+    title,
+    address,
+    source,
+    floorPlans
+  } = listing;
+
+  const getBedBathString = (floorPlans) => {
+    if (floorPlans.length === 1) {
+      const singlePlan = floorPlans[0];
+      return `${singlePlan.bedrooms} Bed | ${singlePlan.bathrooms} Bath`;
+    }
+    const beds = floorPlans.map(fp => fp.bedrooms);
+    const baths = floorPlans.map(fp => fp.bathrooms);
+    return `${Math.min(...beds)}-${Math.max(...beds)} Beds | ${Math.min(...baths)}-${Math.max(...baths)} Baths`;
   };
 
+  // Updated function to handle a single price
+  const getPriceRange = (floorPlans) => {
+    if (floorPlans.length === 1) {
+      return `$${floorPlans[0].price}`;
+    }
+    const prices = floorPlans.map(fp => fp.price);
+    return `$${Math.min(...prices)} - $${Math.max(...prices)}`;
+  };
+
+
+  // 获取卧室和浴室描述
+  const bedBathStr = getBedBathString(floorPlans);
+
+  // 获取价格范围描述
+  const priceRange = getPriceRange(floorPlans);
+
+  // 默认图片地址
+  const defaultImageUrl = `${process.env.PUBLIC_URL}/images/default.png`;
   const mediaStyle = {
-    height: '60%', // 图片高度占卡片的60%
-  };
-
-  const handleFavouriteClick = () => {
-    // 这里你可以添加逻辑来更新用户的收藏状态
-    console.log(`${title} is favourited: ${!isFavourite}`);
+    height: 200, // Adjust this value to change the image height
   };
 
   return (
-    <Grid item xs={12} sm={6} md={6} lg={6}>
-      <Card sx={cardStyle}>
+    <Grid item xs={12} sm={6} md={6}>
+      <Card sx={{ maxWidth: 345, m: 2 }}>
         <CardMedia
           component="img"
-          sx={mediaStyle}
-          image={imageUrl}
-          alt="House"
+          height="140"
+          image={defaultImageUrl}
+          sx={mediaStyle} 
+          alt="Apartment"
         />
         <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography gutterBottom variant="h6" component="div">
-              {title}
-            </Typography>
-            <IconButton onClick={handleFavouriteClick}>
-              <FavoriteBorderIcon color={isFavourite ? "error" : "action"} />
-            </IconButton>
-          </Box>
+          <Typography gutterBottom variant="h7" component="div">
+            {title}
+          </Typography>
           <Typography variant="body2" color="text.secondary">
-            {address}
+            {address || "Fetching address..."}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {bedBathStr}
           </Typography>
           <Typography variant="body1">
-            {`$${price} / month`}
+            {priceRange}
           </Typography>
         </CardContent>
         <CardActions>
           <Button size="small" color="primary">Email Property</Button>
-          <Button size="small" color="primary">Call</Button>
+          {source && (
+            <Button size="small" color="primary" href={`tel:${source}`}>
+              Call
+            </Button>
+          )}
         </CardActions>
       </Card>
     </Grid>
