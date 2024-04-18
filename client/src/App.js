@@ -69,6 +69,8 @@ const defaultCenter = {
   lng: -88.2297364
 };
 
+const addressCache = {};
+
 function App() {
   const [activeMarker, setActiveMarker] = useState(null);
   // 翻页相关
@@ -128,11 +130,23 @@ function App() {
     fetchListings(latLngBounds);
   };
 
+
+
   const fetchAddress = async (latitude, longitude) => {
+    
+    const latLngKey = `${latitude},${longitude}`;
+    if (addressCache[latLngKey]) {
+      // console.log("Address found in cache");
+      return addressCache[latLngKey];
+    }
+
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg&language=en`;
     const response = await fetch(url);
     const data = await response.json();
-    return data.results[0]?.formatted_address || "Address not found";
+    const address = data.results[0]?.formatted_address || "Address not found";
+    addressCache[latLngKey] = address;
+    
+    return address;
   };
 
   const fetchListings = async (bounds) => {
