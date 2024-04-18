@@ -39,6 +39,42 @@ const listings = [
 function App() {
   const [activeMarker, setActiveMarker] = useState(null);
   
+  const campusOptions = [
+    { value: 'Champaign', label: 'Champaign' },
+    { value: 'Urbana', label: 'Urbana' }
+  ];
+
+  const pricingOptions = [
+    { value: '600', label: '600' },
+    { value: '1000', label: '1000' },
+    { value: '1400', label: '1400' }
+  ];
+
+  const pricingTypeOptions = [
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly' }
+  ];
+
+  const bedsBathsOptions = [
+    { value: '1b1b', label: '1 Bed 1 Bath' },
+    { value: '2b1b', label: '2 Bed 1 Bath' }
+  ];
+
+  const buildingTypeOptions = [
+    { value: 'apartment', label: 'Apartment' },
+    { value: 'house', label: 'House' }
+  ];
+
+  const moreOptions = [
+    { value: 'gym', label: 'Gym' },
+    { value: 'pool', label: 'Pool' }
+  ];
+
+  const sortOptions = [
+    { value: 'priceLowToHigh', label: 'Price: Low to High' },
+    { value: 'priceHighToLow', label: 'Price: High to Low' }
+  ];
+
   // 处理Marker悬停事件
   const handleActiveMarker = (marker) => {
     if (marker === activeMarker) {
@@ -73,28 +109,28 @@ function App() {
         <Container maxWidth={false}>
           <Grid container spacing={1} alignItems="center">
             <Grid item xs={12} sm={2}>
-              <Dropdown label="Campus or Town" />
+              <Dropdown label="Campus or Town" options={campusOptions} />
             </Grid>
             <Grid item xs={12} sm={1}>
-              <Dropdown label="Price" />
+              <Dropdown label="Price" options={pricingOptions} />
             </Grid>
             <Grid item xs={12} sm={2}>
-              <Dropdown label="Pricing Type" />
+              <Dropdown label="Pricing Type" options={pricingTypeOptions} />
             </Grid>
             <Grid item xs={12} sm={1}>
-              <Dropdown label="Beds & Baths" />
+              <Dropdown label="Beds & Baths" options={bedsBathsOptions} />
             </Grid>
             <Grid item xs={12} sm={1}>
-              <Dropdown label="Building Type" />
+              <Dropdown label="Building Type" options={buildingTypeOptions} />
             </Grid>
             <Grid item xs={12} sm={1}>
-              <Dropdown label="More" />
+              <Dropdown label="More" options={moreOptions} />
             </Grid>
             <Grid item xs={12} sm={3}>
               <TextField fullWidth label="Search" variant="outlined" />
             </Grid>
             <Grid item xs={12} sm={1}>
-              <Dropdown label="Sort" />
+              <Dropdown label="Sort" options={sortOptions} />
             </Grid>
           </Grid>
         </Container>
@@ -151,7 +187,15 @@ function LoginDialog({ open, onClose }) {
 
   const handleLogin = () => {
     // 登录逻辑...
-    onClose();
+    const loginData = {
+      username,
+      password
+    };
+    axios.post('http://localhost:8080/housing/users/login', loginData)
+    .then(response => {
+      console.log(response.data);
+      onClose();
+    })
   };
 
   const handleRegister = () => {
@@ -164,7 +208,7 @@ function LoginDialog({ open, onClose }) {
       password
     };
 
-    axios.post('http://your-backend-url/register', userData)
+    axios.post('http://localhost:8080/housing/users/register', userData)
     .then(response => {
       console.log(response.data);
       onClose();
@@ -239,13 +283,22 @@ function LoginDialog({ open, onClose }) {
 }
 
 
-function Dropdown({ label }) {
+function Dropdown({ label, options }) {
+  const items = options || [];
+
   return (
     <FormControl fullWidth>
       <InputLabel>{label}</InputLabel>
       <Select label={label} defaultValue="">
-        <MenuItem value="">None</MenuItem>
-        {/* 添加更多的MenuItem组件来代表不同的选项 */}
+        {items.length > 0 ? (
+          items.map((option, index) => (
+            <MenuItem key={index} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))
+        ) : (
+          <MenuItem value="">None</MenuItem>
+        )}
       </Select>
     </FormControl>
   );
