@@ -1,9 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState,useRef } from 'react';
 import { AppBar, Toolbar, Typography, Box, Grid, Pagination , Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { Scale } from '@mui/icons-material';
 
-const mapStyles = {
+const mapStyles = [
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  }
+];
+
+const containerStyle = {
   width: '100%',
   height: 'calc(100vh - 64px)'
 };
@@ -13,114 +69,15 @@ const defaultCenter = {
   lng: -88.2297364
 };
 
-// 模拟房产数据
-const listings = [
-  {
-    title: "Icon Apartment",
-    address: "309 E Springfield Ave, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/8iVWI77Npzj1eSM9GPJkGpoEjdDoL3lVq1yYtDuE64w/111/icon---brand-new-champaign-il-primary-photo.jpg", // 替换为房产图片的URL
-    lat: 40.11291900531373,
-    lng: -88.23440746931675
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-  {
-    title: "The Dean Campustown",
-    address: "102 E Green St, Champaign, IL 61820",
-    price: 1850,
-    imageUrl: "https://images1.apartments.com/i2/xFgpZiNB_QogH4M73YcTpVIqEB35vcuwp8zeQ7k68TA/111/the-dean-campustown-champaign-il-9444-2.jpg", // 替换为房产图片的URL
-    lat: 40.1065968,
-    lng: -88.2330653
-  },
-
-  // ...更多房产数据
-];
-
 function App() {
   const [activeMarker, setActiveMarker] = useState(null);
   // 翻页相关
   const [currentPage, setCurrentPage] = useState(1);
-  const listingsPerPage = 10;
-  const indexOfLastListing = currentPage * listingsPerPage;
-  const indexOfFirstListing = indexOfLastListing - listingsPerPage;
-  const currentListings = listings.slice(indexOfFirstListing, indexOfLastListing);
 
   const handleChangePage = (event, newPage) => {
     setCurrentPage(newPage);
   };
 
-  const totalPages = Math.ceil(listings.length / listingsPerPage);
 
   // 处理Marker悬停事件
   const handleActiveMarker = (marker) => {
@@ -140,6 +97,50 @@ function App() {
   const handleDialogClose = () => {
     setDialogOpen(false);
   };
+
+  const [bounds, setBounds] = useState(null);
+  const [listings, setListings] = useState([]);
+  const mapRef = useRef(null);
+
+  const onLoad = (map) => {
+    mapRef.current = map;
+  };
+
+  const onUnmount = () => {
+    mapRef.current = null;
+  };
+
+  const handleBoundsChange = () => {
+    if (!mapRef.current) return;
+
+    const bounds = mapRef.current.getBounds();
+    const ne = bounds.getNorthEast(); 
+    const sw = bounds.getSouthWest(); 
+
+    const latLngBounds = {
+      minLatitude: sw.lat(),
+      maxLatitude: ne.lat(),
+      minLongitude: sw.lng(),
+      maxLongitude: ne.lng()
+    };
+
+    setBounds(latLngBounds);
+    fetchListings(latLngBounds);
+  };
+
+  const fetchListings = async (bounds) => {
+    const url = `/housing/property/properties/inRectangle?minLatitude=${bounds.minLatitude}&maxLatitude=${bounds.maxLatitude}&minLongitude=${bounds.minLongitude}&maxLongitude=${bounds.maxLongitude}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    setListings(data);
+  };
+
+  const listingsPerPage = 10;
+  const indexOfLastListing = currentPage * listingsPerPage;
+  const indexOfFirstListing = indexOfLastListing - listingsPerPage;
+  const currentListings = listings.slice(indexOfFirstListing, indexOfLastListing);
+  const totalPages = Math.ceil(listings.length / listingsPerPage);
+  
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -185,14 +186,20 @@ function App() {
           <Grid item xs={12} md={8} sx={{ height: '100%' }}>
             <LoadScript googleMapsApiKey="AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg">
               <GoogleMap
-                mapContainerStyle={mapStyles}
+                mapContainerStyle={containerStyle}
                 center={defaultCenter}
                 zoom={14}
+                onLoad={onLoad}
+                onUnmount={onUnmount}
+                onIdle={handleBoundsChange}
+                options={{
+                  styles: mapStyles 
+                }}
               >
                 {listings.map((listing, index) => (
                   <MarkerF
                     key={index}
-                    position={{ lat: listing.lat, lng: listing.lng }}
+                    position={{ lat: listing.latitude, lng: listing.longitude }}
                     onMouseOver={() => handleActiveMarker(index)}
                     onMouseOut={() => handleActiveMarker(null)}
                   >
@@ -200,8 +207,8 @@ function App() {
                       <InfoWindowF onCloseClick={() => setActiveMarker(null)}>
                         <Box>
                           <Typography variant="subtitle2">{listing.title}</Typography>
-                          <Typography variant="body2">{listing.address}</Typography>
-                          <Typography variant="body2">{`$${listing.price} / month`}</Typography>
+                          <Typography variant="body2">{listing.description}</Typography>
+                          <Typography variant="body2">{`$${listing.floorPlans[0].price} / month`}</Typography>
                         </Box>
                       </InfoWindowF>
                     ) : null}
