@@ -129,7 +129,7 @@ function App() {
   };
 
   const fetchAddress = async (latitude, longitude) => {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg&language=en`;
     const response = await fetch(url);
     const data = await response.json();
     return data.results[0]?.formatted_address || "Address not found";
@@ -145,7 +145,7 @@ function App() {
       // 创建一个新的数组来保存包含地址信息的房产列表
       const updatedListings = await Promise.all(data.map(async (listing) => {
         // 如果房产对象没有地址信息，则调用 fetchAddress 函数获取
-        if (!listing.address) {
+        if (listing.address === 'null') {
           listing.address = await fetchAddress(listing.latitude, listing.longitude);
         }
         return listing;
