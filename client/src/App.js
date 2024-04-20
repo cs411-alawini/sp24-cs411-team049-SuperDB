@@ -1,8 +1,32 @@
-import React, { useState,useRef } from 'react';
-import { AppBar, Toolbar, Typography, Box, Grid, Pagination , Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
+import React, { useState,useRef,useEffect  } from 'react';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Box, 
+  Grid, 
+  Pagination, 
+  Card, 
+  CardMedia, 
+  CardContent, 
+  TextField, 
+  Button, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  Container, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  CardActions, 
+  IconButton,
+  Slider,
+  Popover
+} from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Scale } from '@mui/icons-material';
 import { UserProvider } from './UserContext';
 
 import axios from 'axios';
@@ -76,6 +100,50 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  // Price range
+  const [allListings, setAllListings] = useState([]); // 存储所有房源的完整列表
+  const [displayedListings, setDisplayedListings] = useState([]); // 存储将要显示的房源列表
+
+
+  const [priceAnchorEl, setPriceAnchorEl] = useState(null); // 用于控制Popover的定位元素
+  const [priceLimits, setPriceLimits] = useState({ min: 100, max: 5000 });
+  const [selectedPriceRange, setSelectedPriceRange] = useState([100, 5000]);
+
+  useEffect(() => {
+    setCurrentPage(1); // 每次displayedListings变化时，重置到第一页
+  }, [displayedListings]);
+
+
+
+  const applyPriceFilter = () => {
+    const filteredListings = allListings.filter((listing) => {
+      const price = listing.floorPlans[0].price;
+      return price >= selectedPriceRange[0] && price <= selectedPriceRange[1];
+    });
+    setDisplayedListings(filteredListings); // 更新将要显示的房源列表
+  };
+  
+
+  const handlePriceClick = (event) => {
+    setPriceAnchorEl(event.currentTarget); // 设置Popover的定位元素
+  };
+
+  const handlePriceClose = () => {
+    setPriceAnchorEl(null);
+  };
+
+  const handlePriceChange = (event, newValue) => {
+    setSelectedPriceRange(newValue);
+  };
+
+  const open = Boolean(priceAnchorEl);
+  const id = open ? 'price-popover' : undefined;
+
+  // 筛选
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBedBath, setSelectedBedBath] = useState('');
+  const [selectedOther, setSelectedOther] = useState('');
+
   const [activeMarker, setActiveMarker] = useState(null);
   // 翻页相关
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,42 +152,6 @@ function App() {
     setCurrentPage(newPage);
   };
 
-  
-  const campusOptions = [
-    { value: 'Champaign', label: 'Champaign' },
-    { value: 'Urbana', label: 'Urbana' }
-  ];
-
-  const pricingOptions = [
-    { value: '600', label: '600' },
-    { value: '1000', label: '1000' },
-    { value: '1400', label: '1400' }
-  ];
-
-  const pricingTypeOptions = [
-    { value: 'monthly', label: 'Monthly' },
-    { value: 'yearly', label: 'Yearly' }
-  ];
-
-  const bedsBathsOptions = [
-    { value: '1b1b', label: '1 Bed 1 Bath' },
-    { value: '2b1b', label: '2 Bed 1 Bath' }
-  ];
-
-  const buildingTypeOptions = [
-    { value: 'apartment', label: 'Apartment' },
-    { value: 'house', label: 'House' }
-  ];
-
-  const moreOptions = [
-    { value: 'gym', label: 'Gym' },
-    { value: 'pool', label: 'Pool' }
-  ];
-
-  const sortOptions = [
-    { value: 'priceLowToHigh', label: 'Price: Low to High' },
-    { value: 'priceHighToLow', label: 'Price: High to Low' }
-  ];
 
   // 处理Marker悬停事件
   const handleActiveMarker = (marker) => {
@@ -141,7 +173,6 @@ function App() {
   };
 
   const [bounds, setBounds] = useState(null);
-  const [listings, setListings] = useState([]);
   const mapRef = useRef(null);
 
   const onLoad = (map) => {
@@ -167,6 +198,9 @@ function App() {
     };
 
     setBounds(latLngBounds);
+    // fetchListings(latLngBounds).then(() => {
+    //   setSelectedPriceRange([priceLimits.min, priceLimits.max]); // 重置滑块
+    // });
     fetchListings(latLngBounds);
   };
 
@@ -196,6 +230,12 @@ function App() {
       const response = await fetch(url);
       const data = await response.json();
       
+      const prices = data.map(listing => listing.floorPlans[0].price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      setPriceLimits({ min: minPrice, max: maxPrice });
+      setSelectedPriceRange([minPrice, maxPrice]); // 重置选定的价格范围
+
       // 创建一个新的数组来保存包含地址信息的房产列表
       const updatedListings = await Promise.all(data.map(async (listing) => {
         // 如果房产对象没有地址信息，则调用 fetchAddress 函数获取
@@ -205,19 +245,23 @@ function App() {
         return listing;
       }));
       
-      setListings(updatedListings);
+      // setListings(updatedListings);
+      setAllListings(updatedListings); // 存储完整的房源列表
+      setDisplayedListings(updatedListings); // 默认情况下，显示的列表与完整列表相同
+      
     } catch (error) {
       console.error("Failed to fetch listings:", error);
       // 处理错误，可能是设置一个状态来显示错误信息
     }
   };
-
+  
+  // 分页相关计算
   const listingsPerPage = 10;
   const indexOfLastListing = currentPage * listingsPerPage;
   const indexOfFirstListing = indexOfLastListing - listingsPerPage;
-  const currentListings = listings.slice(indexOfFirstListing, indexOfLastListing);
-  const totalPages = Math.ceil(listings.length / listingsPerPage);
-  
+  const currentListings = displayedListings.slice(indexOfFirstListing, indexOfLastListing);
+  console.log('currentListings:', currentListings);
+  const totalPages = Math.ceil(displayedListings.length / listingsPerPage);
 
   return (
   <UserProvider>
@@ -231,38 +275,104 @@ function App() {
           <LoginDialog open={dialogOpen} onClose={handleDialogClose} />
         </Toolbar>
       </AppBar>
-        <Container maxWidth={false}>
-          <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12} sm={2}>
-              <Dropdown label="Campus or Town" options={campusOptions} />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Price" options={pricingOptions} />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Dropdown label="Pricing Type" options={pricingTypeOptions} />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Beds & Baths" options={bedsBathsOptions} />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Building Type" options={buildingTypeOptions} />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="More" options={moreOptions} />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="Search" variant="outlined" />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Dropdown label="Sort" options={sortOptions} />
-            </Grid>
+      <Container maxWidth={false} sx={{ paddingY: 1, borderBottom: 1, borderColor: 'divider' }}>
+        <Grid container spacing={1} alignItems="center" justifyContent="flex-start">
+          {/* 搜索框 */}
+          <Grid item>
+            <TextField 
+              label="Search" 
+              variant="outlined" 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              sx={{ width: 300, marginRight: 2 }} 
+            />
           </Grid>
-        </Container>
+
+        {/* 床位/浴室筛选 */}
+        <Grid item>
+          <FormControl variant="outlined" sx={{ minWidth: 140, marginRight: 2 }}>
+            <InputLabel>Beds/Baths</InputLabel>
+            <Select
+              value={selectedBedBath}
+              onChange={(e) => setSelectedBedBath(e.target.value)}
+              label="Beds/Baths"
+            >
+              <MenuItem value=""><em>None</em></MenuItem>
+              <MenuItem value={"1b1b"}>1 Bed 1 Bath</MenuItem>
+              <MenuItem value={"2b1b"}>2 Bed 1 Bath</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* 其他选项 */}
+        <Grid item>
+          <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+            <InputLabel>Others</InputLabel>
+            <Select
+              value={selectedOther}
+              onChange={(e) => setSelectedOther(e.target.value)}
+              label="Others"
+            >
+              <MenuItem value=""><em>None</em></MenuItem>
+              <MenuItem value={"gym"}>Gym</MenuItem>
+              <MenuItem value={"pool"}>Pool</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* 价格筛选 */}
+        <Grid item>
+        <Button
+          variant="outlined"
+          onClick={handlePriceClick}
+          sx={{
+            borderColor: 'action.active',
+            borderWidth: '1px',
+            borderRadius: '4px',
+            textTransform: 'none',
+            height: '56px', // 使高度与其他输入框相同
+            padding: '6px 16px', // 如果需要，调整内边距以垂直居中文本
+            '&:hover': {
+              borderColor: 'primary.main',
+            },
+          }}
+        >
+        Price Range: ${selectedPriceRange[0]} - ${selectedPriceRange[1]}
+      </Button>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={priceAnchorEl}
+        onClose={handlePriceClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <Box p={2}>
+          <Typography>Adjust Price Range</Typography>
+          <Slider
+            value={selectedPriceRange}
+            onChange={handlePriceChange}
+            onChangeCommitted={applyPriceFilter} // 在这里添加
+            valueLabelDisplay="auto"
+            min={priceLimits.min}
+            max={priceLimits.max}
+          />
+        </Box>
+      </Popover>
+    </Grid>
+
+      </Grid>
+    </Container>
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
         <Grid container sx={{ height: '100%', maxHeight: '100%' }}>
           <Grid item xs={12} md={8} sx={{ height: '100%' }}>
-            <LoadScript googleMapsApiKey="AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg">
+            <LoadScript googleMapsApiKey='AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg'>
               <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={defaultCenter}
@@ -274,7 +384,7 @@ function App() {
                   styles: mapStyles 
                 }}
               >
-                {listings.map((listing, index) => (
+                {displayedListings.map((listing, index) => (
                   <MarkerF
                     key={index}
                     position={{ lat: listing.latitude, lng: listing.longitude }}
@@ -297,7 +407,7 @@ function App() {
           </Grid>
           <Grid item xs={12} md={4} sx={{ height: '100%', overflowY: 'auto' }}>
             <Grid container spacing={2} sx={{ padding: 2 }}>
-              {currentListings.map((listing, index) => (
+            {currentListings.map((listing, index) => (
                 <ListingCard key={index} listing={listing} />
               ))}
             </Grid>
@@ -388,28 +498,6 @@ function LoginDialog({ open, onClose, setUser }) {
         </Button>
       </DialogActions>
     </Dialog>
-  );
-}
-
-
-function Dropdown({ label, options }) {
-  const items = options || [];
-
-  return (
-    <FormControl fullWidth>
-      <InputLabel>{label}</InputLabel>
-      <Select label={label} defaultValue="">
-        {items.length > 0 ? (
-          items.map((option, index) => (
-            <MenuItem key={index} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))
-        ) : (
-          <MenuItem value="">None</MenuItem>
-        )}
-      </Select>
-    </FormControl>
   );
 }
 
