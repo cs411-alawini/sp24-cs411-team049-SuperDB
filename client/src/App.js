@@ -23,7 +23,9 @@ import {
   CardActions, 
   IconButton,
   Slider,
-  Popover
+  Popover,
+  Checkbox,
+  ListItemText
 } from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -109,11 +111,14 @@ function App() {
   const [priceLimits, setPriceLimits] = useState({ min: 100, max: 5000 });
   const [selectedPriceRange, setSelectedPriceRange] = useState([100, 5000]);
 
+  // 筛选
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBedBath, setSelectedBedBath] = useState('');
+  const [selectedOther, setSelectedOther] = useState([]);
+
   useEffect(() => {
     setCurrentPage(1); // 每次displayedListings变化时，重置到第一页
   }, [displayedListings]);
-
-
 
   const applyPriceFilter = () => {
     const filteredListings = allListings.filter((listing) => {
@@ -123,6 +128,62 @@ function App() {
     setDisplayedListings(filteredListings); // 更新将要显示的房源列表
   };
   
+  //Bed/Bath
+  const [bedBathOptions, setBedBathOptions] = useState([]);
+
+  useEffect(() => {
+    const newOptions = new Set();
+    allListings.forEach(listing => {
+      listing.floorPlans.forEach(plan => {
+        const bedBathString = `${plan.bedrooms}b${plan.bathrooms}b`;
+        newOptions.add(bedBathString);
+      });
+    });
+    setBedBathOptions([...newOptions]);
+  }, [allListings]); 
+
+  useEffect(() => {
+    function filterListings() {
+      if (selectedOther.length === 0) {
+        return allListings;
+      }
+  
+      return allListings.filter(listing =>
+        selectedOther.every(amenity => 
+          listing.amenities.split(',').map(a => a.trim()).includes(amenity)
+        )
+      );
+    }
+  
+    setDisplayedListings(filterListings());
+  }, [selectedOther, allListings]);
+  
+
+  //Amenities
+  const [amenitiesOptions, setAmenitiesOptions] = useState([]);
+
+  useEffect(() => {
+    const newOptions = new Set();
+    allListings.forEach(listing => {
+      const amenitiesArray = listing.amenities.split(',');
+      amenitiesArray.forEach(amenity => {
+        newOptions.add(amenity.trim());
+      });
+    });
+    setAmenitiesOptions([...newOptions]);
+  }, [allListings]);
+
+  useEffect(() => {
+    const newOptions = new Set();
+    allListings.forEach(listing => {
+      listing.amenities.split(',')
+        .filter(amenity => amenity.trim().toLowerCase() !== 'null') // 排除'null'
+        .forEach(amenity => {
+          newOptions.add(amenity.trim());
+        });
+    });
+    setAmenitiesOptions([...newOptions]);
+  }, [allListings]);
 
   const handlePriceClick = (event) => {
     setPriceAnchorEl(event.currentTarget); // 设置Popover的定位元素
@@ -139,10 +200,7 @@ function App() {
   const open = Boolean(priceAnchorEl);
   const id = open ? 'price-popover' : undefined;
 
-  // 筛选
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBedBath, setSelectedBedBath] = useState('');
-  const [selectedOther, setSelectedOther] = useState('');
+
 
   const [activeMarker, setActiveMarker] = useState(null);
   // 翻页相关
@@ -197,6 +255,8 @@ function App() {
       maxLongitude: ne.lng()
     };
 
+    setSelectedBedBath('');
+    setSelectedOther([]);
     setBounds(latLngBounds);
     // fetchListings(latLngBounds).then(() => {
     //   setSelectedPriceRange([priceLimits.min, priceLimits.max]); // 重置滑块
@@ -290,34 +350,53 @@ function App() {
 
         {/* 床位/浴室筛选 */}
         <Grid item>
-          <FormControl variant="outlined" sx={{ minWidth: 140, marginRight: 2 }}>
-            <InputLabel>Beds/Baths</InputLabel>
-            <Select
-              value={selectedBedBath}
-              onChange={(e) => setSelectedBedBath(e.target.value)}
-              label="Beds/Baths"
-            >
-              <MenuItem value=""><em>None</em></MenuItem>
-              <MenuItem value={"1b1b"}>1 Bed 1 Bath</MenuItem>
-              <MenuItem value={"2b1b"}>2 Bed 1 Bath</MenuItem>
-            </Select>
-          </FormControl>
+        <FormControl variant="outlined" sx={{ minWidth: 140, marginRight: 2 }}>
+          <InputLabel>Beds/Baths</InputLabel>
+          <Select
+            value={selectedBedBath}
+            onChange={(e) => setSelectedBedBath(e.target.value)}
+            label="Beds/Baths"
+          >
+            <MenuItem value=""><em>None</em></MenuItem>
+            {bedBathOptions.map((option, index) => (
+              <MenuItem key={index} value={option}>
+                {option.replace('b', ' Bed ').replace('b', ' Bath')}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         </Grid>
 
         {/* 其他选项 */}
         <Grid item>
-          <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
             <InputLabel>Others</InputLabel>
             <Select
+              multiple
               value={selectedOther}
               onChange={(e) => setSelectedOther(e.target.value)}
               label="Others"
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 300, // 设置最大高度，您可以调整这个值来满足您的需求
+                    overflow: 'auto', // 超过最大高度时允许滚动
+                  },
+                },
+              }}
             >
-              <MenuItem value=""><em>None</em></MenuItem>
-              <MenuItem value={"gym"}>Gym</MenuItem>
-              <MenuItem value={"pool"}>Pool</MenuItem>
+              {amenitiesOptions.map((option, index) => (
+                <MenuItem key={index} value={option}>
+                  <Checkbox checked={selectedOther.indexOf(option) > -1} />
+                  <ListItemText primary={option} />
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
+
+
+
         </Grid>
 
         {/* 价格筛选 */}
@@ -326,13 +405,11 @@ function App() {
             variant="outlined"
             onClick={handlePriceClick}
             sx={{
-              borderColor: 'action.active',
               borderWidth: '1px',
               borderRadius: '4px',
               textTransform: 'none',
-              height: '56px', // 使高度与其他输入框相同
-              padding: '6px 16px', // 如果需要，调整内边距以垂直居中文本
-              margin: 'auto',
+              height: '56px',
+              padding: '6px 16px',
               '&:hover': {
                 borderColor: 'primary.main',
               },
