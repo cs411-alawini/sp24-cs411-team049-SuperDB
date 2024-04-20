@@ -321,56 +321,57 @@ function App() {
         </Grid>
 
         {/* 价格筛选 */}
-        <Grid item>
-        <Button
-          variant="outlined"
-          onClick={handlePriceClick}
-          sx={{
-            borderColor: 'action.active',
-            borderWidth: '1px',
-            borderRadius: '4px',
-            textTransform: 'none',
-            height: '56px', // 使高度与其他输入框相同
-            padding: '6px 16px', // 如果需要，调整内边距以垂直居中文本
-            '&:hover': {
-              borderColor: 'primary.main',
-            },
-          }}
-        >
-        Price Range: ${selectedPriceRange[0]} - ${selectedPriceRange[1]}
-      </Button>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={priceAnchorEl}
-        onClose={handlePriceClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        <Box p={2}>
-          <Typography>Adjust Price Range</Typography>
-          <Slider
-            value={selectedPriceRange}
-            onChange={handlePriceChange}
-            onChangeCommitted={applyPriceFilter} // 在这里添加
-            valueLabelDisplay="auto"
-            min={priceLimits.min}
-            max={priceLimits.max}
-          />
-        </Box>
-      </Popover>
-    </Grid>
+        <Grid item xs style={{ marginLeft: '16px' }}>
+          <Button
+            variant="outlined"
+            onClick={handlePriceClick}
+            sx={{
+              borderColor: 'action.active',
+              borderWidth: '1px',
+              borderRadius: '4px',
+              textTransform: 'none',
+              height: '56px', // 使高度与其他输入框相同
+              padding: '6px 16px', // 如果需要，调整内边距以垂直居中文本
+              margin: 'auto',
+              '&:hover': {
+                borderColor: 'primary.main',
+              },
+            }}
+          >
+          Price Range: ${selectedPriceRange[0]} - ${selectedPriceRange[1]}
+         </Button>
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={priceAnchorEl}
+            onClose={handlePriceClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <Box p={3}>
+              <Typography>Adjust Price Range</Typography>
+              <Slider
+                value={selectedPriceRange}
+                onChange={handlePriceChange}
+                onChangeCommitted={applyPriceFilter} // 在这里添加
+                valueLabelDisplay="auto"
+                min={priceLimits.min}
+                max={priceLimits.max}
+              />
+            </Box>
+          </Popover>
+        </Grid>
 
       </Grid>
     </Container>
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-        <Grid container sx={{ height: '100%', maxHeight: '100%' }}>
+        <Grid container  sx={{ height: '100%', maxHeight: '100%' }}>
           <Grid item xs={12} md={8} sx={{ height: '100%' }}>
             <LoadScript googleMapsApiKey='AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg'>
               <GoogleMap
