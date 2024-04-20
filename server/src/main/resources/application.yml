@@ -10,4 +10,4 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.housing.entity
 server:
-  port: 8081
+  port: 8080

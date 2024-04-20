@@ -1,7 +1,10 @@
 package com.housing.entity;
+import lombok.Data;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
+@Data
 @Entity
 @Table(name = "FloorPlan")
 public class FloorPlanEntity {

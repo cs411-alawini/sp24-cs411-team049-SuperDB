@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.housing.mapper.ListingMapper">
 
-    <select id="findAvailableListingsWithHighRatings" resultType="com.housing.model.ListingModel">
+    <select id="findAvailableListingsWithHighRatings" resultType="com.housing.entity.ListingModel">
         SELECT L.ListingID, L.PropertyID, L.AvailableDate, FP.Bedrooms, FP.Bathrooms, AR.AverageRating
         FROM Listing L
         JOIN Property P ON L.PropertyID = P.PropertyID

@@ -1,6 +1,6 @@
 package com.housing.controller;
 
-import com.housing.model.ListingModel;
+import com.housing.entity.ListingModel;
 import com.housing.service.ListingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
