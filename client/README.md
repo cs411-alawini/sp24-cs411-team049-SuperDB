@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Initial Setup for this project
+
+You can run `npm install @mui/material @react-google-maps/api @mui/icons-material` to install Material-UI core components, icons, and the React library for Google Maps.
+
 ## Available Scripts
 
 In the project directory, you can run:
