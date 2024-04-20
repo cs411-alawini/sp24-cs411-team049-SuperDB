@@ -9,13 +9,13 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface UserMapper {
 
-    @Insert("INSERT INTO users(username, email, password) " +
+    @Insert("INSERT INTO User(username, email, password) " +
             "VALUES(#{username}, #{email}, #{password})")
     void insertUser(UserEntity user);
 
-    @Select("SELECT * FROM users WHERE username = #{username}")
+    @Select("SELECT * FROM User WHERE username = #{username}")
     UserEntity findByUsername(@Param("username") String username);
 
-    @Select("SELECT * FROM users WHERE email = #{email}")
+    @Select("SELECT * FROM User WHERE email = #{email}")
     UserEntity findByEmail(@Param("email") String email);
 }

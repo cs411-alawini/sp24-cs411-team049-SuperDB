@@ -14,7 +14,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public UserEntity createUser(String username, String email, String password) {
+    public UserEntity registerUser(String username, String email, String password) {
         if (!isValidEmail(email)) {
             throw new IllegalArgumentException("Invalid email format");
         }
@@ -30,7 +30,7 @@ public class UserService {
         return user;
     }
 
-    public UserEntity validateUser(String username, String password) {
+    public UserEntity loginUser(String username, String password) {
         UserEntity user = userMapper.findByUsername(username);
         if (user != null && user.getPassword().equals(hashPassword(password))) {
             return user;
