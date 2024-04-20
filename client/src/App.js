@@ -73,6 +73,8 @@ const defaultCenter = {
   lng: -88.2297364
 };
 
+const addressCache = {};
+
 function App() {
   const [activeMarker, setActiveMarker] = useState(null);
   // 翻页相关
@@ -168,11 +170,23 @@ function App() {
     fetchListings(latLngBounds);
   };
 
+
+
   const fetchAddress = async (latitude, longitude) => {
+    
+    const latLngKey = `${latitude},${longitude}`;
+    if (addressCache[latLngKey]) {
+      // console.log("Address found in cache");
+      return addressCache[latLngKey];
+    }
+
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg&language=en`;
     const response = await fetch(url);
     const data = await response.json();
-    return data.results[0]?.formatted_address || "Address not found";
+    const address = data.results[0]?.formatted_address || "Address not found";
+    addressCache[latLngKey] = address;
+    
+    return address;
   };
 
   const fetchListings = async (bounds) => {
@@ -435,6 +449,11 @@ function ListingCard({ listing }) {
   // 获取价格范围描述
   const priceRange = getPriceRange(floorPlans);
 
+  const handleFavouriteClick = () => {
+    // 这里你可以添加逻辑来更新用户的收藏状态
+    console.log(`${title} is favourited:`);
+  };
+
   // 默认图片地址
   const defaultImageUrl = `${process.env.PUBLIC_URL}/images/default.png`;
   const mediaStyle = {
@@ -452,9 +471,15 @@ function ListingCard({ listing }) {
           alt="Apartment"
         />
         <CardContent>
-          <Typography gutterBottom variant="h7" component="div">
-            {title}
-          </Typography>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography gutterBottom variant="h7" component="div">
+              {title}
+            </Typography>
+            <IconButton onClick={handleFavouriteClick}>
+                {/* Dummy icon */}
+                <FavoriteBorderIcon color={false ? "error" : "action"} />
+            </IconButton>
+          </Box>
           <Typography variant="body2" color="text.secondary">
             {address || "Fetching address..."}
           </Typography>
