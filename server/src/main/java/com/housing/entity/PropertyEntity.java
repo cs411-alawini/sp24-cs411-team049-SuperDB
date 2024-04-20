@@ -1,15 +1,18 @@
 package com.housing.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "Property")
 public class PropertyEntity {
 
     @Id
-    private int propertyID;
+    private Long propertyID;
 
     private String address;
 
