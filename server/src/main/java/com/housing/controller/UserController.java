@@ -1,7 +1,6 @@
 package com.housing.controller;
 
 import com.housing.entity.UserEntity;
-import com.housing.model.UserModel;
 import com.housing.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
