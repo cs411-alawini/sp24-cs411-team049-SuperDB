@@ -2,7 +2,6 @@ import React, { useState,useRef } from 'react';
 import { AppBar, Toolbar, Typography, Box, Grid, Pagination , Card, CardMedia, CardContent, TextField, Button, FormControl, InputLabel, Select, MenuItem, Container,Dialog, DialogTitle, DialogContent, DialogActions, CardActions, IconButton } from '@mui/material';
 import { GoogleMap, LoadScript, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Scale } from '@mui/icons-material';
 import { UserProvider } from './UserContext';
 
 import axios from 'axios';
@@ -79,6 +78,9 @@ function App() {
   const [activeMarker, setActiveMarker] = useState(null);
   // 翻页相关
   const [currentPage, setCurrentPage] = useState(1);
+
+  // User Login/register 相关
+  const [user, setUser] = useState(null);
 
   const handleChangePage = (event, newPage) => {
     setCurrentPage(newPage);
@@ -228,7 +230,7 @@ function App() {
             NextHousing
           </Typography>
           <Button color="inherit" onClick={handleLoginClick}>LOGIN</Button>
-          <LoginDialog open={dialogOpen} onClose={handleDialogClose} />
+          <LoginDialog open={dialogOpen} onClose={handleDialogClose} setUser={setUser} />
         </Toolbar>
       </AppBar>
         <Container maxWidth={false}>
@@ -312,7 +314,7 @@ function App() {
 }
 
 function LoginDialog({ open, onClose, setUser }) {
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = 'http://localhost:8080'; 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState(''); // 用于注册的邮箱状态
   const [password, setPassword] = useState('');
@@ -323,7 +325,9 @@ function LoginDialog({ open, onClose, setUser }) {
   const handleLogin = async () => {
     try {
       const loginData = { username, password };
-      const response = axios.post(apiUrl + '/housing/users/login', loginData);
+      console.log('API URL:', `${apiUrl}/housing/users/login`);
+      const response = await axios.post(`${apiUrl}/housing/users/login`, loginData);
+      
       console.log('Login success:', response.data);
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
@@ -334,9 +338,7 @@ function LoginDialog({ open, onClose, setUser }) {
     }
   };
 
-  // 注册逻辑...
-  const handleRegister = () => {
-    // 检查密码和确认密码是否匹配
+  const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -344,21 +346,24 @@ function LoginDialog({ open, onClose, setUser }) {
 
     try {
       const userData = { username, email, password };
-      const response = axios.post(apiUrl + '/housing/users/register', userData);
+      console.log('API URL:', `${apiUrl}/housing/users/register`);
+      const response = await axios.post(`${apiUrl}/housing/users/register`, userData);
       console.log('Registration success:', response.data);
+
+      console.log(setUser);
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
       onClose();
     } catch (error) {
       console.error('Registration failed:', error);
+      console.error(error.response);
       setError(error.response?.data?.message || 'Registration failed');
     }
   };
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
-    // 切换表单时清空所有字段
-    setUsername('');
+    setUsername('');     // 切换表单时清空所有字段
     setEmail('');
     setPassword('');
     setConfirmPassword('');
