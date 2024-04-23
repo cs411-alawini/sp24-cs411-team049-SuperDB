@@ -123,6 +123,10 @@ function App() {
   const [sortOption, setSortOption] = useState("");
 
   const [activeMarker, setActiveMarker] = useState(null);
+
+  // User Login/register 相关
+  const [user, setUser] = useState(null);
+
   // 翻页相关
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -356,7 +360,7 @@ function App() {
             <Button color="inherit" onClick={handleLoginClick}>
               LOGIN
             </Button>
-            <LoginDialog open={dialogOpen} onClose={handleDialogClose} />
+            <LoginDialog open={dialogOpen} onClose={handleDialogClose} setUser={setUser} />
           </Toolbar>
         </AppBar>
         <Container
@@ -593,7 +597,7 @@ function App() {
 }
 
 function LoginDialog({ open, onClose, setUser }) {
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = 'http://localhost:8080'; 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState(""); // 用于注册的邮箱状态
   const [password, setPassword] = useState("");
@@ -604,8 +608,10 @@ function LoginDialog({ open, onClose, setUser }) {
   const handleLogin = async () => {
     try {
       const loginData = { username, password };
-      const response = axios.post(apiUrl + "/housing/users/login", loginData);
-      console.log("Login success:", response.data);
+      console.log('API URL:', `${apiUrl}/housing/users/login`);
+      const response = await axios.post(`${apiUrl}/housing/users/login`, loginData);
+
+      console.log('Login success:', response.data);
       setUser(response.data);
       localStorage.setItem("user", JSON.stringify(response.data));
       onClose();
@@ -623,13 +629,17 @@ function LoginDialog({ open, onClose, setUser }) {
 
     try {
       const userData = { username, email, password };
-      const response = axios.post(apiUrl + "/housing/users/register", userData);
-      console.log("Registration success:", response.data);
+      console.log('API URL:', `${apiUrl}/housing/users/register`);
+      const response = await axios.post(`${apiUrl}/housing/users/register`, userData);
+      console.log('Registration success:', response.data);
+
+      console.log(setUser);
       setUser(response.data);
       localStorage.setItem("user", JSON.stringify(response.data));
       onClose();
     } catch (error) {
       console.error("Registration failed:", error);
+      console.error(error.response);
       setError(error.response?.data?.message || "Registration failed");
     }
   };
