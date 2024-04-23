@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/housing/users")
 public class UserController {
@@ -18,19 +19,16 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserEntity> registerUser(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String password) {
-        UserEntity registeredUser = userService.registerUser(username, email, password);
+    public ResponseEntity<UserEntity> registerUser(@RequestBody UserEntity user) {
+        System.out.println("Received user: " + user);
+        UserEntity registeredUser = userService.registerUser(user.getUsername(), user.getEmail(), user.getPassword());
         return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserEntity> loginUser(
-            @RequestParam String username,
-            @RequestParam String password) {
-        UserEntity loggedInUser = userService.loginUser(username, password);
+    public ResponseEntity<UserEntity> loginUser(@RequestBody UserEntity user) {
+        System.out.println("Received user: " + user);
+        UserEntity loggedInUser = userService.loginUser(user.getUsername(), user.getPassword());
         return ResponseEntity.ok(loggedInUser);
     }
 }
