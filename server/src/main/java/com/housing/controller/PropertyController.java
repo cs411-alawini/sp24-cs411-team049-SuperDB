@@ -24,7 +24,8 @@ public class PropertyController {
     public List<PropertyModel> getPropertiesInRectangle(@RequestParam double minLatitude,
                                                         @RequestParam double maxLatitude,
                                                         @RequestParam double minLongitude,
-                                                        @RequestParam double maxLongitude) {
-        return propertyService.getPropertiesInRectangle(minLatitude, maxLatitude, minLongitude, maxLongitude);
+                                                        @RequestParam double maxLongitude,
+                                                        @RequestParam(required = false) String title) {
+        return propertyService.getPropertiesInRectangle(minLatitude, maxLatitude, minLongitude, maxLongitude, title);
     }
 }

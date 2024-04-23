@@ -36,12 +36,14 @@
         SELECT * FROM FloorPlan WHERE propertyID = #{propertyID}
     </select>
 
-    <select id="findAllPropertiesWithFloorPlans" resultMap="propertyResultMap">
+    <select id="findAllPropertiesWithFloorPlans" parameterType="map" resultMap="propertyResultMap">
         SELECT p.*, fp.*
         FROM Property p
         LEFT JOIN FloorPlan fp ON p.propertyID = fp.propertyID
         WHERE p.Latitude BETWEEN #{minLatitude} AND #{maxLatitude}
         AND p.Longitude BETWEEN #{minLongitude} AND #{maxLongitude}
+        AND (#{title} IS NULL OR p.title LIKE CONCAT('%', #{title}, '%'))
+        LIMIT 100
     </select>
 
 
