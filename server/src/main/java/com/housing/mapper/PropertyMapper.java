@@ -9,7 +9,8 @@ import java.util.List;
 @Mapper
 public interface PropertyMapper {
     List<PropertyModel> findAllPropertiesWithFloorPlans(@Param("minLatitude") double minLatitude,
-                                                  @Param("maxLatitude") double maxLatitude,
-                                                  @Param("minLongitude") double minLongitude,
-                                                  @Param("maxLongitude") double maxLongitude);
+                                                        @Param("maxLatitude") double maxLatitude,
+                                                        @Param("minLongitude") double minLongitude,
+                                                        @Param("maxLongitude") double maxLongitude,
+                                                        @Param("title") String title);
 }

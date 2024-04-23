@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.housing.mapper.PropertyMapper">
+
+    <resultMap id="floorPlanResultMap" type="com.housing.entity.FloorPlanEntity">
+        <id column="floorPlanID" property="floorPlanID"/>
+        <result column="propertyID" property="propertyID"/>
+        <result column="bedrooms" property="bedrooms"/>
+        <result column="bathrooms" property="bathrooms"/>
+        <result column="squareFeet" property="squareFeet"/>
+        <result column="price" property="price"/>
+        <result column="currency" property="currency"/>
+        <result column="fee" property="fee"/>
+        <result column="hasPhoto" property="hasPhoto"/>
+        <result column="petsAllowed" property="petsAllowed"/>
+    </resultMap>
+
+    <resultMap id="propertyResultMap" type="com.housing.entity.PropertyModel">
+        <id column="propertyID" property="propertyID"/>
+        <result column="address" property="address"/>
+        <result column="amenities" property="amenities"/>
+        <result column="contactNumber" property="contactNumber"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+        <result column="source" property="source"/>
+        <result column="state" property="state"/>
+        <result column="cityName" property="cityName"/>
+        <result column="category" property="category"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="time" property="time"/>
+        <collection property="floorPlans" ofType="com.housing.entity.FloorPlanEntity" column="propertyID" select="selectFloorPlansByProperty"/>
+    </resultMap>
+
+    <select id="selectFloorPlansByProperty" resultMap="floorPlanResultMap">
+        SELECT * FROM FloorPlan WHERE propertyID = #{propertyID}
+    </select>
+
+    <select id="findAllPropertiesWithFloorPlans" parameterType="map" resultMap="propertyResultMap">
+        SELECT p.*, fp.*
+        FROM Property p
+        LEFT JOIN FloorPlan fp ON p.propertyID = fp.propertyID
+        WHERE p.Latitude BETWEEN #{minLatitude} AND #{maxLatitude}
+        AND p.Longitude BETWEEN #{minLongitude} AND #{maxLongitude}
+        AND (#{title} IS NULL OR p.title LIKE CONCAT('%', #{title}, '%'))
+        LIMIT 100
+    </select>
+
+
+</mapper>
