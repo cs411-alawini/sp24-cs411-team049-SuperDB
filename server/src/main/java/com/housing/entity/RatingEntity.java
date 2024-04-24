@@ -14,7 +14,7 @@ public class RatingEntity {
     private int ratingID;
 
     @Column(nullable = false)
-    private int propertyID;
+    private Long propertyID;
 
     @Column(nullable = false, precision = 10)
     private BigDecimal score;
