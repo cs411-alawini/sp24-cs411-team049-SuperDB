@@ -48,8 +48,25 @@ const addressCache = {};
 function App() {
   // Loading 状态
   const [isLoading, setIsLoading] = useState(false);
+  
+  
   // User Login/register 相关
   const [user, setUser] = useState(null);
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
 
   // Price range
   const [allListings, setAllListings] = useState([]);
@@ -310,16 +327,27 @@ function App() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               NextHousing
             </Typography>
+            {user ? (
+            <>
+              <Typography component="span" sx={{ marginRight: 2 }}>
+                Welcome, {user.username}!
+              </Typography>
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          ) : (
             <Button color="inherit" onClick={handleLoginClick}>
-              LOGIN
+              Login
             </Button>
-            <LoginDialog
-              open={dialogOpen}
-              onClose={handleDialogClose}
-              setUser={setUser}
-            />
+          )}
           </Toolbar>
         </AppBar>
+        <LoginDialog
+              open={dialogOpen}
+              onClose={handleDialogClose}
+              setUser={handleLoginSuccess}
+            />
         <Container
           maxWidth={false}
           sx={{ paddingY: 1, borderBottom: 1, borderColor: "divider" }}
