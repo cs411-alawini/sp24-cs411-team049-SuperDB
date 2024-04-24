@@ -8,10 +8,11 @@ import {
   IconButton
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import EditIcon from '@mui/icons-material/Edit';
 
-export function ListingCard({ listing }) {
+export function ListingCard({ listing, isAdmin, onEdit }) {
   // 解构必要的属性
-  const { title, address, source, floorPlans } = listing;
+  const { id, title, address, source, floorPlans } = listing;
 
   const getBedBathString = (floorPlans) => {
     if (floorPlans.length === 1) {
@@ -43,6 +44,10 @@ export function ListingCard({ listing }) {
   const handleFavouriteClick = () => {
     // 这里你可以添加逻辑来更新用户的收藏状态
     console.log(`${title} is favourited:`);
+  };
+
+  const handleEditClick = () => {
+    onEdit(id);
   };
 
   // 默认图片地址
@@ -89,6 +94,15 @@ export function ListingCard({ listing }) {
           {source && (
             <Button size="small" color="primary" href={`tel:${source}`}>
               Call
+            </Button>
+          )}
+          {isAdmin && (
+            <Button
+              size="small"
+              color="primary"
+              startIcon={<EditIcon />}
+              onClick={handleEditClick}>
+              Edit
             </Button>
           )}
         </CardActions>
