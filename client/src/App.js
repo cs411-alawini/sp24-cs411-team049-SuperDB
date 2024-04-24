@@ -6,9 +6,6 @@ import {
   Box,
   Grid,
   Pagination,
-  Card,
-  CardMedia,
-  CardContent,
   TextField,
   Button,
   FormControl,
@@ -16,12 +13,6 @@ import {
   Select,
   MenuItem,
   Container,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  CardActions,
-  IconButton,
   Slider,
   Popover,
   Checkbox,
@@ -33,65 +24,10 @@ import {
   MarkerF,
   InfoWindowF,
 } from "@react-google-maps/api";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { UserProvider } from "./UserContext";
-
-import axios from "axios";
-
-const mapStyles = [
-  {
-    featureType: "administrative.land_parcel",
-    elementType: "labels",
-    stylers: [
-      {
-        visibility: "off",
-      },
-    ],
-  },
-  {
-    featureType: "poi",
-    elementType: "labels.text",
-    stylers: [
-      {
-        visibility: "off",
-      },
-    ],
-  },
-  {
-    featureType: "poi.business",
-    stylers: [
-      {
-        visibility: "off",
-      },
-    ],
-  },
-  {
-    featureType: "road",
-    elementType: "labels.icon",
-    stylers: [
-      {
-        visibility: "off",
-      },
-    ],
-  },
-  {
-    featureType: "road.local",
-    elementType: "labels",
-    stylers: [
-      {
-        visibility: "off",
-      },
-    ],
-  },
-  {
-    featureType: "transit",
-    stylers: [
-      {
-        visibility: "off",
-      },
-    ],
-  },
-];
+import LoginDialog from "./LoginDialog";
+import { ListingCard } from "./ListingCard";
+import { mapStyles } from "./mapStyles";
 
 const containerStyle = {
   width: "100%",
@@ -106,6 +42,9 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  // User Login/register 相关
+  const [user, setUser] = useState(null);
+
   // Price range
   const [allListings, setAllListings] = useState([]);
   const [displayedListings, setDisplayedListings] = useState([]);
@@ -356,7 +295,7 @@ function App() {
             <Button color="inherit" onClick={handleLoginClick}>
               LOGIN
             </Button>
-            <LoginDialog open={dialogOpen} onClose={handleDialogClose} />
+            <LoginDialog open={dialogOpen} onClose={handleDialogClose} setUser={setUser} />
           </Toolbar>
         </AppBar>
         <Container
@@ -589,203 +528,6 @@ function App() {
         </Box>
       </Box>
     </UserProvider>
-  );
-}
-
-function LoginDialog({ open, onClose, setUser }) {
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState(""); // 用于注册的邮箱状态
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // 确认密码状态
-  const [isLogin, setIsLogin] = useState(true);
-  const [, setError] = useState("");
-
-  const handleLogin = async () => {
-    try {
-      const loginData = { username, password };
-      const response = axios.post(apiUrl + "/housing/users/login", loginData);
-      console.log("Login success:", response.data);
-      setUser(response.data);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      onClose();
-    } catch (error) {
-      console.error("Login failed:", error);
-      setError(error.response?.data?.message || "Login failed");
-    }
-  };
-
-  // 注册逻辑...
-  const handleRegister = () => {
-    // 检查密码和确认密码是否匹配
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    try {
-      const userData = { username, email, password };
-      const response = axios.post(apiUrl + "/housing/users/register", userData);
-      console.log("Registration success:", response.data);
-      setUser(response.data);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      onClose();
-    } catch (error) {
-      console.error("Registration failed:", error);
-      setError(error.response?.data?.message || "Registration failed");
-    }
-  };
-
-  const toggleForm = () => {
-    setIsLogin(!isLogin);
-    // 切换表单时清空所有字段
-    setUsername("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setError("");
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{isLogin ? "Login" : "Register"}</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Username"
-          type="text"
-          fullWidth
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        {!isLogin && (
-          <TextField
-            margin="dense"
-            label="Email"
-            fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        )}
-        <TextField
-          margin="dense"
-          label="Password"
-          type="password"
-          fullWidth
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {!isLogin && (
-          <TextField
-            margin="dense"
-            label="Confirm Password"
-            type="password"
-            fullWidth
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={isLogin ? handleLogin : handleRegister}>
-          {isLogin ? "Login" : "Register"}
-        </Button>
-        <Button color="primary" onClick={toggleForm}>
-          {isLogin ? "Register" : "Have an account? Login"}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
-
-function ListingCard({ listing }) {
-  // 解构必要的属性
-  const { title, address, source, floorPlans } = listing;
-
-  const getBedBathString = (floorPlans) => {
-    if (floorPlans.length === 1) {
-      const singlePlan = floorPlans[0];
-      return `${singlePlan.bedrooms} Bed | ${singlePlan.bathrooms} Bath`;
-    }
-    const beds = floorPlans.map((fp) => fp.bedrooms);
-    const baths = floorPlans.map((fp) => fp.bathrooms);
-    return `${Math.min(...beds)}-${Math.max(...beds)} Beds | ${Math.min(
-      ...baths
-    )}-${Math.max(...baths)} Baths`;
-  };
-
-  // Updated function to handle a single price
-  const getPriceRange = (floorPlans) => {
-    if (floorPlans.length === 1) {
-      return `$${floorPlans[0].price}`;
-    }
-    const prices = floorPlans.map((fp) => fp.price);
-    return `$${Math.min(...prices)} - $${Math.max(...prices)}`;
-  };
-
-  // 获取卧室和浴室描述
-  const bedBathStr = getBedBathString(floorPlans);
-
-  // 获取价格范围描述
-  const priceRange = getPriceRange(floorPlans);
-
-  const handleFavouriteClick = () => {
-    // 这里你可以添加逻辑来更新用户的收藏状态
-    console.log(`${title} is favourited:`);
-  };
-
-  // 默认图片地址
-  const defaultImageUrl = `${process.env.PUBLIC_URL}/images/default.png`;
-  const mediaStyle = {
-    height: 200, // Adjust this value to change the image height
-  };
-
-  return (
-    <Grid item xs={12} sm={6} md={6}>
-      <Card sx={{ maxWidth: 345, m: 2 }}>
-        <CardMedia
-          component="img"
-          height="140"
-          image={defaultImageUrl}
-          sx={mediaStyle}
-          alt="Apartment"
-        />
-        <CardContent>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography gutterBottom variant="h7" component="div">
-              {title}
-            </Typography>
-            <IconButton onClick={handleFavouriteClick}>
-              {/* Dummy icon */}
-              <FavoriteBorderIcon color={false ? "error" : "action"} />
-            </IconButton>
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            {address || "Fetching address..."}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {bedBathStr}
-          </Typography>
-          <Typography variant="body1">{priceRange}</Typography>
-        </CardContent>
-        <CardActions>
-          <Button size="small" color="primary">
-            Email Property
-          </Button>
-          {source && (
-            <Button size="small" color="primary" href={`tel:${source}`}>
-              Call
-            </Button>
-          )}
-        </CardActions>
-      </Card>
-    </Grid>
   );
 }
 
