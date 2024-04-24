@@ -6,3 +6,6 @@
 
 # idea
 .idea/
+
+# Compiled class file
+*.class
