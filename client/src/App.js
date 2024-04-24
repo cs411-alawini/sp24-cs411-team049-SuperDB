@@ -48,24 +48,42 @@ const addressCache = {};
 function App() {
   // Loading 状态
   const [isLoading, setIsLoading] = useState(false);
-  
-  
+
   // User Login/register 相关
   const [user, setUser] = useState(null);
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      console.log('User Loaded:', userData);
+      console.log('Is Admin:', userData.userID === 1003);
     }
   }, []);
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    console.log('User Logged In:', userData);
+    console.log('Is Admin on login:', userData.userID === 1003);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
     setUser(null);
+    console.log('User Logged Out');
+  };
+
+  // Admin
+  const ADMIN_ID = 1003;
+  const isAdmin = user && user.userID === ADMIN_ID;
+
+  const handleEditListing = (listingId) => {
+    console.log('Editing listing ID:', listingId);
+  };
+
+  const handleAddNewListing = () => {
+    console.log('Adding a new listing');
   };
 
   // Price range
@@ -316,7 +334,7 @@ function App() {
     indexOfFirstListing,
     indexOfLastListing
   );
-  console.log("currentListings:", currentListings);
+  // console.log("currentListings:", currentListings);
   const totalPages = Math.ceil(displayedListings.length / listingsPerPage);
 
   return (
@@ -329,12 +347,18 @@ function App() {
             </Typography>
             {user ? (
             <>
+              {isAdmin && (
+                <Button color="inherit" onClick={handleAddNewListing}>
+                  Add Listing
+                </Button>
+              )}
               <Typography component="span" sx={{ marginRight: 2 }}>
                 Welcome, {user.username}!
               </Typography>
               <Button color="inherit" onClick={handleLogout}>
                 Logout
               </Button>
+              
             </>
           ) : (
             <Button color="inherit" onClick={handleLoginClick}>
@@ -592,7 +616,7 @@ function App() {
               ) : displayedListings.length > 0 ? (
                 <Grid container spacing={2} sx={{ padding: 2 }}>
                   {displayedListings.map((listing, index) => (
-                    <ListingCard key={index} listing={listing} />
+                    <ListingCard key={index} listing={listing} isAdmin={isAdmin} onEdit={handleEditListing} />
                   ))}
                 </Grid>
               ) : (
