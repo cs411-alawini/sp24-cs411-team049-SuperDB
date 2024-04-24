@@ -6,7 +6,6 @@ import {
   Box,
   Grid,
   Pagination,
-  TextField,
   Button,
   FormControl,
   InputLabel,
@@ -20,6 +19,7 @@ import {
   OutlinedInput,
   IconButton,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import {
   GoogleMap,
@@ -46,6 +46,8 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  // Loading 状态
+  const [isLoading, setIsLoading] = useState(false);
   // User Login/register 相关
   const [user, setUser] = useState(null);
 
@@ -243,6 +245,7 @@ function App() {
   };
 
   const fetchListings = async (bounds, title = "") => {
+    setIsLoading(true);
     const titleParam = title ? `&title=${encodeURIComponent(title)}` : "";
     const url = `/housing/property/properties/inRectangle?minLatitude=${bounds.minLatitude}&maxLatitude=${bounds.maxLatitude}&minLongitude=${bounds.minLongitude}&maxLongitude=${bounds.maxLongitude}${titleParam}`;
 
@@ -250,11 +253,18 @@ function App() {
       const response = await fetch(url);
       const data = await response.json();
 
-      const prices = data.map((listing) => listing.floorPlans[0].price);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      setPriceLimits({ min: minPrice, max: maxPrice });
-      setSelectedPriceRange([minPrice, maxPrice]); // 重置选定的价格范围
+      if (data && data.length > 0) {
+        // 如果数据不为空，则设置为数据中的最小和最大价格
+        const prices = data.map((listing) => listing.floorPlans[0].price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        setPriceLimits({ min: minPrice, max: maxPrice });
+        setSelectedPriceRange([minPrice, maxPrice]);
+      } else {
+        // 数据为空，设置默认的价格范围
+        setPriceLimits({ min: 0, max: 0 }); // 可以根据实际情况调整这些值
+        setSelectedPriceRange([0, 0]);
+      }
 
       // 创建一个新的数组来保存包含地址信息的房产列表
       const updatedListings = await Promise.all(
@@ -276,6 +286,8 @@ function App() {
     } catch (error) {
       console.error("Failed to fetch listings:", error);
       // 处理错误，可能是设置一个状态来显示错误信息
+    } finally {
+      setIsLoading(false); // 完成加载数据
     }
   };
 
@@ -538,16 +550,45 @@ function App() {
               md={4}
               sx={{ height: "100%", overflowY: "auto" }}
             >
-              <Grid container spacing={2} sx={{ padding: 2 }}>
-                {currentListings.map((listing, index) => (
-                  <ListingCard key={index} listing={listing} />
-                ))}
-              </Grid>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handleChangePage}
-              />
+              {isLoading ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              ) : displayedListings.length > 0 ? (
+                <Grid container spacing={2} sx={{ padding: 2 }}>
+                  {displayedListings.map((listing, index) => (
+                    <ListingCard key={index} listing={listing} />
+                  ))}
+                </Grid>
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  <Typography variant="subtitle1">
+                    No listings available
+                  </Typography>
+                </Box>
+              )}
+              {!isLoading && displayedListings.length > 0 && (
+                <Pagination
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={handleChangePage}
+                  sx={{ paddingY: 2 }}
+                />
+              )}
             </Grid>
           </Grid>
         </Box>
