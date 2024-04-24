@@ -1,18 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Box,
-  Grid, Card,
+  Grid,
+  Card,
   CardMedia,
-  CardContent, Button, CardActions,
-  IconButton
+  CardContent,
+  Button,
+  CardActions,
+  IconButton,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
+import Rating from "@mui/material/Rating";
 
 export function ListingCard({ listing, isAdmin, onEdit }) {
+  // 评分
+  const [rating, setRating] = useState(0);
+
+  const fetchRating = async (propertyId) => {
+    try {
+      const numericPropertyId = Number(propertyId);
+      console.log("Fetching rating for property:", numericPropertyId);
+      const response = await fetch(
+        `/housing/ratings/score/${numericPropertyId}`
+      );
+      const score = await response.json();
+      setRating(score); // 将获取的评分设置到状态中
+    } catch (error) {
+      console.error("Failed to fetch rating:", error);
+      // 处理错误情况
+    }
+  };
+  useEffect(() => {
+    fetchRating(listing.propertyID); // 获取当前房源的评分
+  }, [listing.propertyID]); // 当 listing.id 变化时重新获取评分
   // 解构必要的属性
-  const { id, title, address, source, floorPlans } = listing;
+  const { propertyID, title, address, source, floorPlans } = listing;
 
   const getBedBathString = (floorPlans) => {
     if (floorPlans.length === 1) {
@@ -47,7 +71,8 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
   };
 
   const handleEditClick = () => {
-    onEdit(id);
+    console.log("Editing listing:", listing);
+    onEdit(listing);
   };
 
   // 默认图片地址
@@ -64,7 +89,8 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
           height="140"
           image={defaultImageUrl}
           sx={mediaStyle}
-          alt="Apartment" />
+          alt="Apartment"
+        />
         <CardContent>
           <Box
             display="flex"
@@ -82,6 +108,10 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
           <Typography variant="body2" color="text.secondary">
             {address || "Fetching address..."}
           </Typography>
+          <Box display="flex" alignItems="center" mt={1} mb={2}>
+            <Rating value={rating} readOnly />
+            <Typography variant="subtitle2" ml={1}></Typography>
+          </Box>
           <Typography variant="body2" color="text.secondary">
             {bedBathStr}
           </Typography>
@@ -96,15 +126,18 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
               Call
             </Button>
           )}
-          {isAdmin && (
-            <Button
-              size="small"
-              color="primary"
-              startIcon={<EditIcon />}
-              onClick={handleEditClick}>
-              Edit
-            </Button>
-          )}
+          <Box flexGrow={1} display="flex" justifyContent="flex-end">
+            {isAdmin && (
+              <Button
+                size="small"
+                color="primary"
+                startIcon={<EditIcon />}
+                onClick={handleEditClick}
+              >
+                Edit
+              </Button>
+            )}
+          </Box>
         </CardActions>
       </Card>
     </Grid>
