@@ -17,6 +17,9 @@ import {
   Popover,
   Checkbox,
   ListItemText,
+  OutlinedInput,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import {
   GoogleMap,
@@ -24,6 +27,7 @@ import {
   MarkerF,
   InfoWindowF,
 } from "@react-google-maps/api";
+import SearchIcon from "@mui/icons-material/Search";
 import { UserProvider } from "./UserContext";
 import LoginDialog from "./LoginDialog";
 import { ListingCard } from "./ListingCard";
@@ -218,6 +222,7 @@ function App() {
     setSelectedBedBath("");
     setSelectedOther([]);
     setSortOption("");
+    setSearchQuery("");
     setBounds(latLngBounds);
     fetchListings(latLngBounds);
   };
@@ -237,8 +242,9 @@ function App() {
     return address;
   };
 
-  const fetchListings = async (bounds) => {
-    const url = `/housing/property/properties/inRectangle?minLatitude=${bounds.minLatitude}&maxLatitude=${bounds.maxLatitude}&minLongitude=${bounds.minLongitude}&maxLongitude=${bounds.maxLongitude}`;
+  const fetchListings = async (bounds, title = "") => {
+    const titleParam = title ? `&title=${encodeURIComponent(title)}` : "";
+    const url = `/housing/property/properties/inRectangle?minLatitude=${bounds.minLatitude}&maxLatitude=${bounds.maxLatitude}&minLongitude=${bounds.minLongitude}&maxLongitude=${bounds.maxLongitude}${titleParam}`;
 
     try {
       const response = await fetch(url);
@@ -295,7 +301,11 @@ function App() {
             <Button color="inherit" onClick={handleLoginClick}>
               LOGIN
             </Button>
-            <LoginDialog open={dialogOpen} onClose={handleDialogClose} setUser={setUser} />
+            <LoginDialog
+              open={dialogOpen}
+              onClose={handleDialogClose}
+              setUser={setUser}
+            />
           </Toolbar>
         </AppBar>
         <Container
@@ -310,13 +320,28 @@ function App() {
           >
             {/* 搜索框 */}
             <Grid item>
-              <TextField
-                label="Search"
+              <FormControl
                 variant="outlined"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{ width: 300, marginRight: 2 }}
-              />
+                sx={{ width: 300, marginRight: 1 }}
+              >
+                <OutlinedInput
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search Listings"
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => fetchListings(bounds, searchQuery)}
+                        edge="end"
+                        aria-label="search listings"
+                      >
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  labelWidth={0}
+                />
+              </FormControl>
             </Grid>
 
             {/* 床位/浴室筛选 */}
