@@ -1,5 +1,6 @@
 package com.housing.entity;
 
+import com.housing.util.UUIDGenerator;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -35,4 +36,8 @@ public class PropertyModel {
     private Date time;
 
     private List<FloorPlanEntity> floorPlans;
+
+    public PropertyModel() {
+        this.propertyID = UUIDGenerator.generateLongUUID();
+    }
 }

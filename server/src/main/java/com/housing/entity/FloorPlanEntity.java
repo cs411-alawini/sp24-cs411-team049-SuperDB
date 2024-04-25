@@ -10,10 +10,11 @@ import java.math.BigDecimal;
 public class FloorPlanEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int floorPlanID;
 
     @Column(nullable = false)
-    private long propertyID;
+    private Long propertyID;
 
     private Integer bedrooms;
 

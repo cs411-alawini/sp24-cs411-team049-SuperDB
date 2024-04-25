@@ -33,7 +33,7 @@
     </resultMap>
 
     <select id="selectFloorPlansByProperty" resultMap="floorPlanResultMap">
-        SELECT * FROM FloorPlan WHERE propertyID = #{propertyID}
+        SELECT * FROM FloorPlan WHERE propertyID = #{propertyId}
     </select>
 
     <select id="findAllPropertiesWithFloorPlans" parameterType="map" resultMap="propertyResultMap">
@@ -46,5 +46,30 @@
         LIMIT 100
     </select>
 
+    <insert id="insertProperty" parameterType="com.housing.entity.PropertyModel">
+        INSERT INTO Property (address, amenities, contactNumber, latitude, longitude, source, state, cityName, category, title, description, time)
+        VALUES (#{address}, #{amenities}, #{contactNumber}, #{latitude}, #{longitude}, #{source}, #{state}, #{cityName}, #{category}, #{title}, #{description}, #{time})
+    </insert>
+
+    <update id="updateProperty" parameterType="com.housing.entity.PropertyModel">
+        UPDATE Property
+        SET address = #{address}, amenities = #{amenities}, contactNumber = #{contactNumber},
+        latitude = #{latitude}, longitude = #{longitude}, source = #{source}, state = #{state},
+        cityName = #{cityName}, category = #{category}, title = #{title}, description = #{description}, time = #{time}
+        WHERE propertyID = #{propertyID}
+    </update>
+
+    <delete id="deleteProperty" parameterType="Long">
+        DELETE FROM Property WHERE propertyID = #{propertyId}
+    </delete>
+
+    <insert id="insertFloorPlan" parameterType="com.housing.entity.FloorPlanEntity">
+        INSERT INTO FloorPlan (propertyID, bedrooms, bathrooms, squareFeet, price, currency, fee, hasPhoto, petsAllowed)
+        VALUES (#{propertyID}, #{bedrooms}, #{bathrooms}, #{squareFeet}, #{price}, #{currency}, #{fee}, #{hasPhoto}, #{petsAllowed})
+    </insert>
+
+    <delete id="deleteFloorPlans" parameterType="Long">
+        DELETE FROM FloorPlan WHERE propertyID = #{propertyId}
+    </delete>
 
 </mapper>
