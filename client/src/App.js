@@ -32,6 +32,7 @@ import { UserProvider } from "./UserContext";
 import LoginDialog from "./LoginDialog";
 import { ListingCard } from "./ListingCard";
 import { mapStyles } from "./mapStyles";
+import { EditListingForm } from "./EditListingForm";
 
 const containerStyle = {
   width: "100%",
@@ -46,44 +47,65 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  // Editing Form
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingListing, setEditingListing] = useState(null);
+
+  const handleEditListing = (listing) => {
+    setEditingListing(listing);
+    setIsEditing(true);
+  };
+
+  // 用于关闭编辑表单的方法
+  const handleCloseEdit = () => {
+    setIsEditing(false);
+    setEditingListing(null);
+  };
+
   // Loading 状态
   const [isLoading, setIsLoading] = useState(false);
 
   // User Login/register 相关
   const [user, setUser] = useState(null);
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       setUser(userData);
-      console.log('User Loaded:', userData);
-      console.log('Is Admin:', userData.userID === 1003);
+      console.log("User Loaded:", userData);
+      console.log("Is Admin:", userData.userID === 1003);
     }
   }, []);
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    console.log('User Logged In:', userData);
-    console.log('Is Admin on login:', userData.userID === 1003);
+    localStorage.setItem("user", JSON.stringify(userData));
+    console.log("User Logged In:", userData);
+    console.log("Is Admin on login:", userData.userID === 1003);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
     setUser(null);
-    console.log('User Logged Out');
+    console.log("User Logged Out");
   };
 
   // Admin
   const ADMIN_ID = 1003;
   const isAdmin = user && user.userID === ADMIN_ID;
 
-  const handleEditListing = (listingId) => {
-    console.log('Editing listing ID:', listingId);
-  };
-
   const handleAddNewListing = () => {
-    console.log('Adding a new listing');
+    const newListing = {
+      title: "",
+      address: "",
+      contactNumber: "",
+      description: "",
+      latitude: defaultCenter.lat,
+      longitude: defaultCenter.lng,
+      floorPlans: [{ bedrooms: "", bathrooms: "", price: "" }],
+    };
+    setEditingListing(newListing); // 设置新列表数据
+    setIsEditing(true); // 打开编辑表单
   };
 
   // Price range
@@ -346,32 +368,31 @@ function App() {
               NextHousing
             </Typography>
             {user ? (
-            <>
-              {isAdmin && (
-                <Button color="inherit" onClick={handleAddNewListing}>
-                  Add Listing
+              <>
+                {isAdmin && (
+                  <Button color="inherit" onClick={handleAddNewListing}>
+                    Add Listing
+                  </Button>
+                )}
+                <Typography component="span" sx={{ marginRight: 2 }}>
+                  Welcome, {user.username}!
+                </Typography>
+                <Button color="inherit" onClick={handleLogout}>
+                  Logout
                 </Button>
-              )}
-              <Typography component="span" sx={{ marginRight: 2 }}>
-                Welcome, {user.username}!
-              </Typography>
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
+              </>
+            ) : (
+              <Button color="inherit" onClick={handleLoginClick}>
+                Login
               </Button>
-              
-            </>
-          ) : (
-            <Button color="inherit" onClick={handleLoginClick}>
-              Login
-            </Button>
-          )}
+            )}
           </Toolbar>
         </AppBar>
         <LoginDialog
-              open={dialogOpen}
-              onClose={handleDialogClose}
-              setUser={handleLoginSuccess}
-            />
+          open={dialogOpen}
+          onClose={handleDialogClose}
+          setUser={handleLoginSuccess}
+        />
         <Container
           maxWidth={false}
           sx={{ paddingY: 1, borderBottom: 1, borderColor: "divider" }}
@@ -615,8 +636,13 @@ function App() {
                 </Box>
               ) : displayedListings.length > 0 ? (
                 <Grid container spacing={2} sx={{ padding: 2 }}>
-                  {displayedListings.map((listing, index) => (
-                    <ListingCard key={index} listing={listing} isAdmin={isAdmin} onEdit={handleEditListing} />
+                  {currentListings.map((listing, index) => (
+                    <ListingCard
+                      key={index}
+                      listing={listing}
+                      isAdmin={isAdmin}
+                      onEdit={handleEditListing}
+                    />
                   ))}
                 </Grid>
               ) : (
@@ -644,6 +670,18 @@ function App() {
             </Grid>
           </Grid>
         </Box>
+        {isEditing && (
+          <EditListingForm
+            open={isEditing}
+            onClose={handleCloseEdit}
+            listing={editingListing}
+            onSave={(updatedListing) => {
+              console.log("Updated listing:", updatedListing);
+              // 这里可以调用API来保存更新，或者更新状态来反映更改
+              handleCloseEdit(); // 在保存之后关闭编辑表单
+            }}
+          />
+        )}
       </Box>
     </UserProvider>
   );
