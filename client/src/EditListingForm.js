@@ -1,25 +1,78 @@
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // 引入加号图标
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import { useState } from "react";
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 
-export function EditListingForm({ open, onClose, listing, onSave }) {
+export function EditListingForm({
+  open,
+  onClose,
+  listing,
+  onSave,
+  onSnackbarOpen,
+}) {
+  //  Delete
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  const handleDelete = () => {
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!listing.propertyID) {
+      onSnackbarOpen("No property ID provided for deletion.", "error");
+      return;
+    }
+    const url = `/housing/property/properties/delete/${listing.propertyID}`;
+    const requestOptions = {
+      method: "DELETE",
+    };
+
+    try {
+      const response = await fetch(url, requestOptions);
+      const result = await response.text();
+      if (result !== "OK") {
+        throw new Error(`Server responded with an error: ${result}`);
+      }
+      onSnackbarOpen("Property deleted successfully!", "success");
+      onClose();
+    } catch (error) {
+      console.error("Failed to delete property:", error);
+      onSnackbarOpen("Failed to delete property. Please try again.", "error");
+    }
+    setDeleteConfirmOpen(false); // 关闭确认对话框
+  };
+
+  // Form Data
   const [formData, setFormData] = useState({
     ...listing,
     currentFloorPlanIndex: 0,
-    floorPlans: listing.floorPlans || [{}], // 确保始终有至少一个楼层平面图
+    floorPlans: listing.floorPlans || [
+      {
+        bedrooms: "",
+        bathrooms: "",
+        price: "",
+        petsAllowed: "None",
+      },
+    ], // 确保始终有至少一个楼层平面图
   });
   const addFloorPlan = () => {
-    const newFloorPlan = { bedrooms: "", bathrooms: "", price: "" }; // 根据需要调整默认字段
+    const newFloorPlan = {
+      bedrooms: "",
+      bathrooms: "",
+      price: "",
+      petsAllowed: "None",
+    };
     const updatedFloorPlans = [...formData.floorPlans, newFloorPlan];
     setFormData({ ...formData, floorPlans: updatedFloorPlans });
     handleChangeFloorPlanIndex(updatedFloorPlans.length - 1);
@@ -62,18 +115,82 @@ export function EditListingForm({ open, onClose, listing, onSave }) {
     }));
   };
 
-  const handleSave = () => {
-    onSave(formData);
-    onClose();
-  };
-
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyDNvm9qmRm_qIhkcY9ryTzuVCciCSTmrvg",
   });
 
+  const submitForm = async () => {
+    // 判断是添加还是更新
+    const isAdding = !formData.propertyID; // 如果没有 propertyID，视为添加
+    const url = isAdding
+      ? `/housing/property/properties/create`
+      : `/housing/property/properties/update/${formData.propertyID}`;
+
+    const requestBody = {
+      ...(isAdding ? {} : { propertyID: formData.propertyID }), // 添加时不包含 propertyID
+      address: formData.address || "null",
+      amenities: formData.amenities || "null",
+      contactNumber: formData.contactNumber || null,
+      latitude: formData.latitude,
+      longitude: formData.longitude,
+      source: formData.source || "admin",
+      state: formData.state || "IL",
+      cityName: formData.cityName || "Urbana",
+      category: formData.category || "housing/rent/apartment",
+      title: formData.title,
+      description: formData.description,
+      time: formData.time || new Date().toISOString(), // 如果是添加，使用当前时间
+      floorPlans: formData.floorPlans.map((plan) => ({
+        ...(plan.floorPlanID ? { floorPlanID: plan.floorPlanID } : {}), // 只在编辑时包含 floorPlanID
+        bedrooms: plan.bedrooms,
+        bathrooms: plan.bathrooms,
+        squareFeet: plan.squareFeet,
+        price: plan.price,
+        currency: plan.currency || "USD",
+        fee: plan.fee || 0,
+        hasPhoto: plan.hasPhoto || false,
+        petsAllowed: plan.petsAllowed || "None",
+      })),
+    };
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    };
+
+    try {
+      const response = await fetch(url, requestOptions);
+      const result = await response.text(); // 使用text方法接收文本响应
+      if (result !== "OK") {
+        throw new Error(`Server responded with an error: ${result}`);
+      }
+      console.log("Submission successful:", result);
+      onSnackbarOpen("Submission successful!", "success");
+      onSave(formData); // Call onSave after successful update or addition
+      onClose();
+    } catch (error) {
+      console.error("Failed to submit listing:", error);
+      onSnackbarOpen("Failed to submit listing. Please try again.", "error");
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Edit Listing</DialogTitle>
+      <DialogTitle>
+        Edit Listing{" "}
+        <IconButton
+          color="error"
+          onClick={handleDelete}
+          sx={{
+            position: "absolute", // 定位到标题栏
+            top: 8, // 距离顶部8像素
+            right: 8, // 距离右侧8像素
+          }}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
         <TextField
           fullWidth
@@ -154,6 +271,20 @@ export function EditListingForm({ open, onClose, listing, onSave }) {
         />
         <TextField
           fullWidth
+          label="Pets Allowed"
+          name="petsAllowed"
+          value={currentFloorPlan.petsAllowed}
+          onChange={(e) =>
+            handleFloorPlanChange(
+              formData.currentFloorPlanIndex,
+              "petsAllowed",
+              e.target.value
+            )
+          }
+          margin="normal"
+        />
+        <TextField
+          fullWidth
           label="Price"
           type="number"
           value={currentFloorPlan.price}
@@ -199,13 +330,30 @@ export function EditListingForm({ open, onClose, listing, onSave }) {
             </IconButton>
           </Box>
           <Box>
-            <Button onClick={handleSave} color="primary">
+            <Button onClick={submitForm} color="primary">
               Save
             </Button>
             <Button onClick={handleCancel}>Cancel</Button>
           </Box>
         </Box>
       </DialogContent>
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+      >
+        <DialogTitle>{"Confirm Deletion"}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this property?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>No</Button>
+          <Button onClick={confirmDelete} color="error">
+            Yes, Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 }
