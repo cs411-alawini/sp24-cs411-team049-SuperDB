@@ -32,4 +32,6 @@ public class FloorPlanEntity {
 
     private String petsAllowed;
 
+    private int priceChanged;
+
 }

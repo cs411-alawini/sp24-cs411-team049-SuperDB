@@ -1,6 +1,7 @@
 package com.housing.mapper;
 
 import com.housing.entity.FloorPlanEntity;
+import com.housing.entity.PropertyEntity;
 import com.housing.entity.PropertyModel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,9 +16,9 @@ public interface PropertyMapper {
                                                         @Param("maxLongitude") double maxLongitude,
                                                         @Param("title") String title);
 
-    void insertProperty(PropertyModel property);
+    void insertProperty(PropertyEntity property);
 
-    void updateProperty(PropertyModel property);
+    void updateProperty(PropertyEntity property);
 
     void deleteProperty(@Param("propertyId") Long propertyId);
 
