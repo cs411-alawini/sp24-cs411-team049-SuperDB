@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 
 function LoginDialog({ open, onClose, setUser }) {
-  const apiUrl = "/";
+  const apiUrl = "";
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState(""); // 用于注册的邮箱状态
   const [password, setPassword] = useState("");
