@@ -33,6 +33,7 @@ import LoginDialog from "./LoginDialog";
 import { ListingCard } from "./ListingCard";
 import { mapStyles } from "./mapStyles";
 import { EditListingForm } from "./EditListingForm";
+import { Snackbar, Alert } from "@mui/material";
 
 const containerStyle = {
   width: "100%",
@@ -47,6 +48,21 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  // Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+
+  const handleSnackbarOpen = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   // Editing Form
   const [isEditing, setIsEditing] = useState(false);
   const [editingListing, setEditingListing] = useState(null);
@@ -54,6 +70,14 @@ function App() {
   const handleEditListing = (listing) => {
     setEditingListing(listing);
     setIsEditing(true);
+  };
+
+  const handleSave = (updatedListing) => {
+    console.log("Updated listing:", updatedListing);
+    // 这里可以调用API来保存更新，或者更新状态来反映更改
+    handleSnackbarOpen("Listing updated successfully.", "success");
+    handleCloseEdit(); // 在保存之后关闭编辑表单
+    // handleBoundsChange(); // 重新加载列表，如果需要
   };
 
   // 用于关闭编辑表单的方法
@@ -673,15 +697,29 @@ function App() {
         {isEditing && (
           <EditListingForm
             open={isEditing}
-            onClose={handleCloseEdit}
+            onClose={() => {
+              handleCloseEdit();
+              handleBoundsChange();
+            }}
             listing={editingListing}
             onSave={(updatedListing) => {
               console.log("Updated listing:", updatedListing);
-              // 这里可以调用API来保存更新，或者更新状态来反映更改
               handleCloseEdit(); // 在保存之后关闭编辑表单
+              handleBoundsChange(); // 重新加载列表
             }}
+            onSnackbarOpen={handleSnackbarOpen}
           />
         )}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Box>
     </UserProvider>
   );
