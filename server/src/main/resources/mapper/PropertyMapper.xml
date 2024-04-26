@@ -53,10 +53,10 @@
 
     <update id="updateProperty" parameterType="com.housing.entity.PropertyEntity">
         UPDATE Property
-        SET address = #{address}, amenities = #{amenities}, contactNumber = #{contactNumber},
-        latitude = #{latitude}, longitude = #{longitude}, source = #{source}, state = #{state},
-        cityName = #{cityName}, category = #{category}, title = #{title}, description = #{description}, time = #{time}
-        WHERE propertyID = #{propertyID}
+        SET Address = #{address}, Amenities = #{amenities}, ContactNumber = #{contactNumber},
+        Latitude = #{latitude}, Longitude = #{longitude}, Source = #{source}, State = #{state},
+        CityName = #{cityName}, Category = #{category}, Title = #{title}, Description = #{description}, Time = #{time}
+        WHERE PropertyID = #{propertyID}
     </update>
 
     <delete id="deleteProperty" parameterType="Long">
