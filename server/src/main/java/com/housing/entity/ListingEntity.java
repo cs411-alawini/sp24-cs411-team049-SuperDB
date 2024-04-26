@@ -13,7 +13,7 @@ public class ListingEntity {
     private int listingID;
 
     @Column(nullable = false)
-    private long propertyID;
+    private Long propertyID;
 
     private Date availableDate;
 
