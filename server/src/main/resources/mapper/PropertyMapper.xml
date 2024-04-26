@@ -46,12 +46,12 @@
         LIMIT 100
     </select>
 
-    <insert id="insertProperty" parameterType="com.housing.entity.PropertyModel">
-        INSERT INTO Property (address, amenities, contactNumber, latitude, longitude, source, state, cityName, category, title, description, time)
-        VALUES (#{address}, #{amenities}, #{contactNumber}, #{latitude}, #{longitude}, #{source}, #{state}, #{cityName}, #{category}, #{title}, #{description}, #{time})
+    <insert id="insertProperty" parameterType="com.housing.entity.PropertyEntity" useGeneratedKeys="true" keyProperty="propertyID">
+        INSERT INTO Property (PropertyID, Address, Amenities, ContactNumber, Latitude, Longitude, Source, State, CityName, Category, Title, Description, Time)
+        VALUES (#{propertyID}, #{address}, #{amenities}, #{contactNumber}, #{latitude}, #{longitude}, #{source}, #{state}, #{cityName}, #{category}, #{title}, #{description}, #{time})
     </insert>
 
-    <update id="updateProperty" parameterType="com.housing.entity.PropertyModel">
+    <update id="updateProperty" parameterType="com.housing.entity.PropertyEntity">
         UPDATE Property
         SET address = #{address}, amenities = #{amenities}, contactNumber = #{contactNumber},
         latitude = #{latitude}, longitude = #{longitude}, source = #{source}, state = #{state},
@@ -63,9 +63,9 @@
         DELETE FROM Property WHERE propertyID = #{propertyId}
     </delete>
 
-    <insert id="insertFloorPlan" parameterType="com.housing.entity.FloorPlanEntity">
-        INSERT INTO FloorPlan (propertyID, bedrooms, bathrooms, squareFeet, price, currency, fee, hasPhoto, petsAllowed)
-        VALUES (#{propertyID}, #{bedrooms}, #{bathrooms}, #{squareFeet}, #{price}, #{currency}, #{fee}, #{hasPhoto}, #{petsAllowed})
+    <insert id="insertFloorPlan" parameterType="com.housing.entity.FloorPlanEntity" useGeneratedKeys="true" keyProperty="floorPlanID">
+        INSERT INTO FloorPlan (FloorPlanID, PropertyID, Bedrooms, Bathrooms, SquareFeet, Price, Currency, Fee, HasPhoto, PetsAllowed, PriceChanged)
+        VALUES (#{floorPlanID}, #{propertyID}, #{bedrooms}, #{bathrooms}, #{squareFeet}, #{price}, #{currency}, #{fee}, #{hasPhoto}, #{petsAllowed}, #{priceChanged})
     </insert>
 
     <delete id="deleteFloorPlans" parameterType="Long">

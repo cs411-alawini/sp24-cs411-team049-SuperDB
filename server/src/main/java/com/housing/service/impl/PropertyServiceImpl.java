@@ -1,9 +1,11 @@
 package com.housing.service.impl;
 
+import com.housing.entity.PropertyEntity;
 import com.housing.entity.PropertyModel;
 import com.housing.entity.FloorPlanEntity;
 import com.housing.mapper.PropertyMapper;
 import com.housing.service.PropertyService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,31 +23,44 @@ public class PropertyServiceImpl implements PropertyService {
         return propertyMapper.findAllPropertiesWithFloorPlans(minLatitude, maxLatitude, minLongitude, maxLongitude, title);
     }
 
+
     @Override
     @Transactional
-    public void createProperty(PropertyModel property) {
-        propertyMapper.insertProperty(property);
-        if (property.getFloorPlans() != null) {
-            for (FloorPlanEntity floorPlan : property.getFloorPlans()) {
-                floorPlan.setPropertyID(property.getPropertyID()); // 手动设置 PropertyID
+    public void createProperty(PropertyModel propertyModel) {
+        PropertyEntity propertyEntity = convertToPropertyEntity(propertyModel);
+        propertyMapper.insertProperty(propertyEntity);
+
+        Long propertyID = propertyEntity.getPropertyID();
+
+        if (propertyModel.getFloorPlans() != null) {
+            for (FloorPlanEntity floorPlan : propertyModel.getFloorPlans()) {
+                floorPlan.setPropertyID(propertyID);
                 propertyMapper.insertFloorPlan(floorPlan);
             }
         }
     }
 
+
     @Override
     @Transactional
-    public void updateProperty(PropertyModel property) {
-        propertyMapper.updateProperty(property);
-        propertyMapper.deleteFloorPlans(property.getPropertyID());
-        if (property.getFloorPlans() != null) {
-            for (FloorPlanEntity floorPlan : property.getFloorPlans()) {
-                floorPlan.setPropertyID(property.getPropertyID()); // 手动设置 PropertyID
+    public void updateProperty(PropertyModel propertyModel) {
+        PropertyEntity propertyEntity = convertToPropertyEntity(propertyModel);
+        propertyMapper.updateProperty(propertyEntity);
+        propertyMapper.deleteFloorPlans(propertyModel.getPropertyID());
+
+        if (propertyModel.getFloorPlans() != null) {
+            for (FloorPlanEntity floorPlan : propertyModel.getFloorPlans()) {
+                floorPlan.setPropertyID(propertyModel.getPropertyID());
                 propertyMapper.insertFloorPlan(floorPlan);
             }
         }
     }
 
+    private PropertyEntity convertToPropertyEntity(PropertyModel propertyModel) {
+        PropertyEntity propertyEntity = new PropertyEntity();
+        BeanUtils.copyProperties(propertyModel, propertyEntity, "propertyID");
+        return propertyEntity;
+    }
 
     @Transactional
     @Override

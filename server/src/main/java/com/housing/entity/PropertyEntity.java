@@ -1,6 +1,5 @@
 package com.housing.entity;
 
-import com.housing.util.UUIDGenerator;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,6 +12,7 @@ import java.util.Date;
 public class PropertyEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long propertyID;
 
     private String address;
@@ -40,9 +40,4 @@ public class PropertyEntity {
     private String description;
 
     private Date time;
-
-    public PropertyEntity() {
-        this.propertyID = UUIDGenerator.generateLongUUID();
-    }
-
 }
