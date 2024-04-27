@@ -12,11 +12,22 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCat, faDog } from "@fortawesome/free-solid-svg-icons";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import EditIcon from "@mui/icons-material/Edit";
 import Rating from "@mui/material/Rating";
 
-export function ListingCard({ listing, isAdmin, onEdit }) {
+export function ListingCard({
+  listing,
+  isAdmin,
+  onEdit,
+  isFavorited,
+  toggleFavourite,
+}) {
+  // 处理点击收藏/取消收藏图标
+  const handleFavouriteClick = () => {
+    toggleFavourite(listing.propertyID, isFavorited); // 传递当前物业ID和新的收藏状态
+  };
   // 猫猫狗狗
   const getPetsAllowedIcons = (petsAllowed) => {
     if (!petsAllowed || petsAllowed === "null") {
@@ -81,11 +92,6 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
   // 获取价格范围描述
   const priceRange = getPriceRange(floorPlans);
 
-  const handleFavouriteClick = () => {
-    // 这里你可以添加逻辑来更新用户的收藏状态
-    console.log(`${title} is favourited:`);
-  };
-
   const handleEditClick = () => {
     console.log("Editing listing:", listing);
     onEdit(listing);
@@ -117,8 +123,11 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
               {title}
             </Typography>
             <IconButton onClick={handleFavouriteClick}>
-              {/* Dummy icon */}
-              <FavoriteBorderIcon color={false ? "error" : "action"} />
+              {isFavorited ? (
+                <FavoriteIcon color="error" />
+              ) : (
+                <FavoriteBorderIcon />
+              )}
             </IconButton>
           </Box>
           <Typography variant="body2" color="text.secondary">
