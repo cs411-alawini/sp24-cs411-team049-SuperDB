@@ -47,8 +47,13 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     @Transactional
     public void updateProperty(PropertyModel propertyModel) {
-        PropertyEntity propertyEntity = updatePropertyEntity(propertyModel);
-        propertyMapper.updateProperty(propertyEntity);
+        PropertyEntity propertyEntity = propertyMapper.getPropertyById(propertyModel.getPropertyID());
+        if (propertyEntity != null) {
+            BeanUtils.copyProperties(propertyModel, propertyEntity);
+            propertyMapper.updateProperty(propertyEntity);
+        } else {
+            throw new IllegalStateException("No property found with ID: " + propertyModel.getPropertyID());
+        }
 
         List<FloorPlanEntity> existingFloorPlans = propertyMapper.getFloorPlansByPropertyId(propertyModel.getPropertyID());
 
@@ -83,14 +88,6 @@ public class PropertyServiceImpl implements PropertyService {
         BeanUtils.copyProperties(propertyModel, propertyEntity, "propertyID");
         return propertyEntity;
     }
-
-    private PropertyEntity updatePropertyEntity(PropertyModel propertyModel) {
-        PropertyEntity propertyEntity = new PropertyEntity();
-        BeanUtils.copyProperties(propertyModel, propertyEntity);
-        return propertyEntity;
-    }
-
-
 
     @Transactional
     @Override

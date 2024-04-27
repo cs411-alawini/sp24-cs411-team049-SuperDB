@@ -22,6 +22,8 @@ public interface PropertyMapper {
 
     void deleteProperty(@Param("propertyId") Long propertyId);
 
+    PropertyEntity getPropertyById(Long propertyId);
+
     List<FloorPlanEntity> getFloorPlansByPropertyId(Long propertyID);
 
     void insertFloorPlan(FloorPlanEntity floorPlan);

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Mapper
 public interface RatingMapper {
 
-    @Select("SELECT score FROM Rating WHERE propertyID = #{propertyId}")
     BigDecimal findScoreByPropertyId(@Param("propertyId") Long propertyId);
+
+    int updateScoreByPropertyId(@Param("propertyId") Long propertyId, @Param("Score") BigDecimal score);
 }

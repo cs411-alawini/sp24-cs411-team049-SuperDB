@@ -17,4 +17,9 @@ public class RatingServiceImpl implements RatingService {
     public BigDecimal getScoreByPropertyId(Long propertyId) {
         return ratingMapper.findScoreByPropertyId(propertyId);
     }
+
+    @Override
+    public boolean changeRatingScore(Long propertyId, BigDecimal newScore) {
+        return ratingMapper.updateScoreByPropertyId(propertyId, newScore) > 0;
+    }
 }

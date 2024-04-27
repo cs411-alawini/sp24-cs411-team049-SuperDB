@@ -6,10 +6,7 @@ import com.housing.service.RatingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,6 +24,16 @@ public class RatingController {
         BigDecimal score = ratingService.getScoreByPropertyId(propertyId);
         if (score != null) {
             return ResponseEntity.ok(score);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/score/update")
+    public ResponseEntity<?> updateScoreByPropertyId(@RequestParam Long propertyId, @RequestBody BigDecimal score) {
+        boolean updated = ratingService.changeRatingScore(propertyId, score);
+        if (updated) {
+            return ResponseEntity.ok("OK");
         } else {
             return ResponseEntity.notFound().build();
         }

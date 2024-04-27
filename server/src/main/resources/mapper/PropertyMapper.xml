@@ -63,6 +63,10 @@
         DELETE FROM Property WHERE propertyID = #{propertyId}
     </delete>
 
+    <select id="getPropertyById" resultType="com.housing.entity.PropertyEntity">
+        SELECT * FROM Property WHERE propertyID = #{propertyId}
+    </select>
+
     <select id="getFloorPlansByPropertyId" resultMap="floorPlanResultMap">
         SELECT * FROM FloorPlan WHERE propertyID = #{propertyID}
     </select>
