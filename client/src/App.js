@@ -48,6 +48,27 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  // Rating
+  const updateRating = async (propertyId, newRating) => {
+    try {
+      const url = `/housing/ratings/score/update?propertyId=${propertyId}`;
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newRating),
+      });
+      if (response.ok) {
+        console.log("Rating updated successfully");
+      } else {
+        throw new Error("Failed to update rating");
+      }
+    } catch (error) {
+      console.error("Error updating rating:", error);
+    }
+  };
+
   // Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -720,19 +741,6 @@ function App() {
               ) : displayedListings.length > 0 ? (
                 <Grid container spacing={2} sx={{ padding: 2 }}>
                   {currentListings.map((listing, index) => (
-                    // <ListingCard
-                    //   key={index}
-                    //   listing={listing}
-                    //   isAdmin={isAdmin}
-                    //   onEdit={handleEditListing}
-                    //   isFavorited={favourites.includes(listing.propertyID)}
-                    //   onFavouriteClick={(shouldFavourite) =>
-                    //     handleToggleFavourite(
-                    //       listing.propertyID,
-                    //       shouldFavourite
-                    //     )
-                    //   }
-                    // />
                     <ListingCard
                       key={index}
                       listing={listing}
@@ -740,6 +748,7 @@ function App() {
                       onEdit={handleEditListing}
                       isFavorited={favourites.includes(listing.propertyID)}
                       toggleFavourite={handleToggleFavourite}
+                      updateRating={updateRating}
                     />
                   ))}
                 </Grid>

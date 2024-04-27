@@ -23,6 +23,7 @@ export function ListingCard({
   onEdit,
   isFavorited,
   toggleFavourite,
+  updateRating,
 }) {
   // 处理点击收藏/取消收藏图标
   const handleFavouriteClick = () => {
@@ -31,14 +32,14 @@ export function ListingCard({
   // 猫猫狗狗
   const getPetsAllowedIcons = (petsAllowed) => {
     if (!petsAllowed || petsAllowed === "null") {
-      return null; // 如果 petsAllowed 是 "null" 或未定义，则不显示任何图标
+      return null;
     }
     const icons = [];
     if (petsAllowed.includes("Dogs")) {
-      icons.push(<FontAwesomeIcon key="dog-icon" icon={faDog} />); // 添加狗狗图标
+      icons.push(<FontAwesomeIcon key="dog-icon" icon={faDog} />);
     }
     if (petsAllowed.includes("Cats")) {
-      icons.push(<FontAwesomeIcon key="cat-icon" icon={faCat} />); // 添加猫猫图标
+      icons.push(<FontAwesomeIcon key="cat-icon" icon={faCat} />);
     }
     return <Box display="flex">{icons}</Box>;
   };
@@ -56,12 +57,17 @@ export function ListingCard({
       setRating(score); // 将获取的评分设置到状态中
     } catch (error) {
       console.error("Failed to fetch rating:", error);
-      // 处理错误情况
     }
   };
   useEffect(() => {
     fetchRating(listing.propertyID); // 获取当前房源的评分
   }, [listing.propertyID]); // 当 listing.id 变化时重新获取评分
+
+  const handleRatingChange = async (newRating) => {
+    setRating(newRating);
+    await updateRating(listing.propertyID, newRating);
+  };
+
   // 解构必要的属性
   const { propertyID, title, address, source, floorPlans } = listing;
 
@@ -140,7 +146,15 @@ export function ListingCard({
             mb={2}
             justifyContent="space-between" // 这将确保评分在左侧，图标在右侧
           >
-            <Rating value={rating} readOnly />
+            <Rating
+              value={rating}
+              onChange={(event, newValue) => {
+                if (isAdmin) {
+                  handleRatingChange(newValue);
+                }
+              }}
+              readOnly={!isAdmin}
+            />
             <Box flexGrow={1} /> {/* 这将推动宠物图标到右侧 */}
             {getPetsAllowedIcons(floorPlans[0].petsAllowed)}
           </Box>
