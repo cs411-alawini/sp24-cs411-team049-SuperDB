@@ -10,18 +10,34 @@ import {
   CardActions,
   IconButton,
 } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCat, faDog } from "@fortawesome/free-solid-svg-icons";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import EditIcon from "@mui/icons-material/Edit";
 import Rating from "@mui/material/Rating";
 
 export function ListingCard({ listing, isAdmin, onEdit }) {
+  // 猫猫狗狗
+  const getPetsAllowedIcons = (petsAllowed) => {
+    if (!petsAllowed || petsAllowed === "null") {
+      return null; // 如果 petsAllowed 是 "null" 或未定义，则不显示任何图标
+    }
+    const icons = [];
+    if (petsAllowed.includes("Dogs")) {
+      icons.push(<FontAwesomeIcon key="dog-icon" icon={faDog} />); // 添加狗狗图标
+    }
+    if (petsAllowed.includes("Cats")) {
+      icons.push(<FontAwesomeIcon key="cat-icon" icon={faCat} />); // 添加猫猫图标
+    }
+    return <Box display="flex">{icons}</Box>;
+  };
+
   // 评分
   const [rating, setRating] = useState(0);
 
   const fetchRating = async (propertyId) => {
     try {
       const numericPropertyId = Number(propertyId);
-      console.log("Fetching rating for property:", numericPropertyId);
       const response = await fetch(
         `/housing/ratings/score/${numericPropertyId}`
       );
@@ -108,9 +124,16 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
           <Typography variant="body2" color="text.secondary">
             {address || "Fetching address..."}
           </Typography>
-          <Box display="flex" alignItems="center" mt={1} mb={2}>
+          <Box
+            display="flex"
+            alignItems="center"
+            mt={1}
+            mb={2}
+            justifyContent="space-between" // 这将确保评分在左侧，图标在右侧
+          >
             <Rating value={rating} readOnly />
-            <Typography variant="subtitle2" ml={1}></Typography>
+            <Box flexGrow={1} /> {/* 这将推动宠物图标到右侧 */}
+            {getPetsAllowedIcons(floorPlans[0].petsAllowed)}
           </Box>
           <Typography variant="body2" color="text.secondary">
             {bedBathStr}
