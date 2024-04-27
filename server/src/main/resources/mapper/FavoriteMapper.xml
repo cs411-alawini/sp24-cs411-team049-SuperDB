@@ -6,4 +6,12 @@
         CALL AddToFavorites(#{propertyID}, #{userID})
     </insert>
 
+    <delete id="deleteFavorite" parameterType="map">
+        DELETE FROM Favorites WHERE userID = #{userId} AND propertyID = #{propertyId}
+    </delete>
+
+    <select id="findPropertyIdsByUserId" parameterType="int" resultType="long">
+        SELECT propertyID FROM Favorites WHERE userID = #{userId}
+    </select>
+
 </mapper>
