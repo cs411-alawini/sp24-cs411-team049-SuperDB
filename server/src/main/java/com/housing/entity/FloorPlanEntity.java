@@ -11,7 +11,7 @@ public class FloorPlanEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int floorPlanID;
+    private Integer floorPlanID;
 
     @Column(nullable = false)
     private Long propertyID;

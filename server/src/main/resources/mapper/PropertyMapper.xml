@@ -63,10 +63,27 @@
         DELETE FROM Property WHERE propertyID = #{propertyId}
     </delete>
 
+    <select id="getFloorPlansByPropertyId" resultMap="floorPlanResultMap">
+        SELECT * FROM FloorPlan WHERE propertyID = #{propertyID}
+    </select>
+
+
     <insert id="insertFloorPlan" parameterType="com.housing.entity.FloorPlanEntity" useGeneratedKeys="true" keyProperty="floorPlanID">
         INSERT INTO FloorPlan (FloorPlanID, PropertyID, Bedrooms, Bathrooms, SquareFeet, Price, Currency, Fee, HasPhoto, PetsAllowed, PriceChanged)
         VALUES (#{floorPlanID}, #{propertyID}, #{bedrooms}, #{bathrooms}, #{squareFeet}, #{price}, #{currency}, #{fee}, #{hasPhoto}, #{petsAllowed}, #{priceChanged})
     </insert>
+
+    <update id="updateFloorPlan" parameterType="com.housing.entity.FloorPlanEntity">
+        UPDATE FloorPlan
+        SET bedrooms = #{bedrooms}, bathrooms = #{bathrooms}, squareFeet = #{squareFeet},
+        price = #{price}, currency = #{currency}, fee = #{fee}, hasPhoto = #{hasPhoto},
+        petsAllowed = #{petsAllowed}, priceChanged = #{priceChanged}
+        WHERE floorPlanID = #{floorPlanID}
+    </update>
+
+    <delete id="deleteFloorPlanById" parameterType="Integer">
+        DELETE FROM FloorPlan WHERE floorPlanID = #{floorPlanID}
+    </delete>
 
     <delete id="deleteFloorPlans" parameterType="Long">
         DELETE FROM FloorPlan WHERE propertyID = #{propertyId}
