@@ -9,7 +9,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Date;
 
 @Service
 public class FavoriteServiceImpl implements FavoriteService {
@@ -20,11 +22,10 @@ public class FavoriteServiceImpl implements FavoriteService {
     private final SQLExceptionTranslator sqlExceptionTranslator = new SQLStateSQLExceptionTranslator();
 
     @Override
-    public void addFavorite(int userId, Long propertyId, int listingId) {
+    public void addFavorite(int userId, Long propertyId) {
         FavoriteEntity favorite = new FavoriteEntity();
         favorite.setUserID(userId);
         favorite.setPropertyID(propertyId);
-        // favorite.setListingID(listingId);
         // favorite.setPriceAtFavTime(BigDecimal.ZERO);
         // favorite.setFavTime(new Date());
 

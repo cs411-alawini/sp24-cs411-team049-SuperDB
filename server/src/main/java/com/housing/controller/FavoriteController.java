@@ -20,9 +20,8 @@ public class FavoriteController {
     @PostMapping("/add")
     public ResponseEntity<String> addFavorite(
             @RequestParam int userId,
-            @RequestParam Long propertyId,
-            @RequestParam int listingId) {
-        favoriteService.addFavorite(userId, propertyId, listingId);
+            @RequestParam Long propertyId) {
+        favoriteService.addFavorite(userId, propertyId);
         return ResponseEntity.ok("OK");
     }
 }
