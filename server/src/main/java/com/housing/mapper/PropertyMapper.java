@@ -22,9 +22,13 @@ public interface PropertyMapper {
 
     void deleteProperty(@Param("propertyId") Long propertyId);
 
-    List<FloorPlanEntity> selectFloorPlansByProperty(Long propertyID);
+    List<FloorPlanEntity> getFloorPlansByPropertyId(Long propertyID);
 
     void insertFloorPlan(FloorPlanEntity floorPlan);
 
-    void deleteFloorPlans(@Param("propertyId") Long propertyId);
+    void deleteFloorPlans(@Param("propertyId") Long propertyID);
+
+    void updateFloorPlan(FloorPlanEntity floorPlan);
+
+    void deleteFloorPlanById(Integer floorPlanID);
 }

@@ -33,9 +33,9 @@ public class PropertyController {
         return ResponseEntity.ok("OK");
     }
 
-    @PutMapping("/properties/update/{propertyId}")
-    public ResponseEntity<?> updateProperty(@PathVariable Long propertyId, @RequestBody PropertyModel property) {
-        log.info("Updating property with ID {}: {}", propertyId, property);
+    @PutMapping("/properties/update/")
+    public ResponseEntity<?> updateProperty(@RequestBody PropertyModel property) {
+        log.info("Updating property with details: {}", property);
         propertyService.updateProperty(property);
         return ResponseEntity.ok("OK");
     }

@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PropertyServiceImpl implements PropertyService {
@@ -27,7 +30,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     @Transactional
     public void createProperty(PropertyModel propertyModel) {
-        PropertyEntity propertyEntity = convertToPropertyEntity(propertyModel);
+        PropertyEntity propertyEntity = createPropertyEntity(propertyModel);
         propertyMapper.insertProperty(propertyEntity);
 
         Long propertyID = propertyEntity.getPropertyID();
@@ -44,23 +47,49 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     @Transactional
     public void updateProperty(PropertyModel propertyModel) {
-        PropertyEntity propertyEntity = convertToPropertyEntity(propertyModel);
+        PropertyEntity propertyEntity = updatePropertyEntity(propertyModel);
         propertyMapper.updateProperty(propertyEntity);
-        propertyMapper.deleteFloorPlans(propertyModel.getPropertyID());
 
-        if (propertyModel.getFloorPlans() != null) {
-            for (FloorPlanEntity floorPlan : propertyModel.getFloorPlans()) {
-                floorPlan.setPropertyID(propertyModel.getPropertyID());
-                propertyMapper.insertFloorPlan(floorPlan);
+        List<FloorPlanEntity> existingFloorPlans = propertyMapper.getFloorPlansByPropertyId(propertyModel.getPropertyID());
+
+        Set<Integer> incomingIds = propertyModel.getFloorPlans().stream()
+                .map(FloorPlanEntity::getFloorPlanID)
+                .collect(Collectors.toSet());
+
+        existingFloorPlans.stream()
+                .filter(f -> !incomingIds.contains(f.getFloorPlanID()))
+                .forEach(f -> propertyMapper.deleteFloorPlanById(f.getFloorPlanID()));
+
+        for (FloorPlanEntity incomingFloorPlan : propertyModel.getFloorPlans()) {
+            Optional<FloorPlanEntity> existingPlan = existingFloorPlans.stream()
+                    .filter(f -> f.getFloorPlanID().equals(incomingFloorPlan.getFloorPlanID()))
+                    .findFirst();
+
+            if (existingPlan.isPresent()) {
+                if (!incomingFloorPlan.getPrice().equals(existingPlan.get().getPrice())) {
+                    incomingFloorPlan.setPriceChanged(1);
+                }
+                propertyMapper.updateFloorPlan(incomingFloorPlan);
+            } else {
+                propertyMapper.insertFloorPlan(incomingFloorPlan);
             }
         }
     }
 
-    private PropertyEntity convertToPropertyEntity(PropertyModel propertyModel) {
+
+    private PropertyEntity createPropertyEntity(PropertyModel propertyModel) {
         PropertyEntity propertyEntity = new PropertyEntity();
         BeanUtils.copyProperties(propertyModel, propertyEntity, "propertyID");
         return propertyEntity;
     }
+
+    private PropertyEntity updatePropertyEntity(PropertyModel propertyModel) {
+        PropertyEntity propertyEntity = new PropertyEntity();
+        BeanUtils.copyProperties(propertyModel, propertyEntity);
+        return propertyEntity;
+    }
+
+
 
     @Transactional
     @Override
