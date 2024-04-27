@@ -9,6 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import { useState } from "react";
@@ -85,6 +86,19 @@ export function EditListingForm({
       currentFloorPlanIndex: index,
     }));
   };
+
+  const removeCurrentFloorPlan = () => {
+    if (formData.currentFloorPlanIndex > 0 && formData.floorPlans.length > 1) {
+      const newFloorPlans = formData.floorPlans.filter(
+        (_, index) => index !== formData.currentFloorPlanIndex
+      );
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        floorPlans: newFloorPlans,
+        currentFloorPlanIndex: Math.max(0, formData.currentFloorPlanIndex - 1),
+      }));
+    }
+  };
   // 更新表单数据的方法
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -124,7 +138,7 @@ export function EditListingForm({
     const isAdding = !formData.propertyID; // 如果没有 propertyID，视为添加
     const url = isAdding
       ? `/housing/property/properties/create`
-      : `/housing/property/properties/update/${formData.propertyID}`;
+      : `/housing/property/properties/update/`;
 
     const requestBody = {
       ...(isAdding ? {} : { propertyID: formData.propertyID }), // 添加时不包含 propertyID
@@ -154,24 +168,32 @@ export function EditListingForm({
     };
 
     const requestOptions = {
-      method: "POST",
+      method: isAdding ? "POST" : "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
     };
 
     try {
       const response = await fetch(url, requestOptions);
-      const result = await response.text(); // 使用text方法接收文本响应
+      const result = await response.text();
       if (result !== "OK") {
         throw new Error(`Server responded with an error: ${result}`);
       }
       console.log("Submission successful:", result);
-      onSnackbarOpen("Submission successful!", "success");
-      onSave(formData); // Call onSave after successful update or addition
+      if (isAdding) {
+        onSnackbarOpen("Property added successfully!", "success");
+      } else {
+        onSnackbarOpen("Property updated successfully!", "success");
+      }
+      onSave(formData);
       onClose();
     } catch (error) {
       console.error("Failed to submit listing:", error);
-      onSnackbarOpen("Failed to submit listing. Please try again.", "error");
+      if (isAdding) {
+        onSnackbarOpen("Failed to add property. Please try again.", "error");
+      } else {
+        onSnackbarOpen("Failed to update property. Please try again.", "error");
+      }
     }
   };
 
@@ -312,6 +334,11 @@ export function EditListingForm({
             <IconButton onClick={addFloorPlan}>
               <AddCircleOutlineIcon />
             </IconButton>
+            {formData.currentFloorPlanIndex > 0 && (
+              <IconButton onClick={removeCurrentFloorPlan} color="error">
+                <RemoveCircleOutlineIcon />
+              </IconButton>
+            )}
             <IconButton
               onClick={() =>
                 handleChangeFloorPlanIndex(

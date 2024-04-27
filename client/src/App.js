@@ -132,6 +132,65 @@ function App() {
     setIsEditing(true); // 打开编辑表单
   };
 
+  // Favourites
+  const [favourites, setFavourites] = useState([]);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  useEffect(() => {
+    if (user && user.userID) {
+      const fetchFavourites = async () => {
+        try {
+          const response = await fetch(
+            `/housing/favorites/get?userId=${user.userID}`
+          );
+          const data = await response.json();
+          setFavourites(data || []);
+        } catch (error) {
+          console.error("Failed to fetch favourites:", error);
+        }
+      };
+
+      fetchFavourites();
+    }
+  }, [user]);
+
+  const handleToggleFavourite = async (propertyId, isFavorited) => {
+    const url = isFavorited
+      ? "/housing/favorites/remove"
+      : "/housing/favorites/add";
+    const method = isFavorited ? "DELETE" : "POST";
+    const body = new URLSearchParams();
+    body.append("userId", user.userID);
+    body.append("propertyId", propertyId);
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: body,
+      });
+
+      if (response.ok) {
+        setFavourites((prev) => {
+          return isFavorited
+            ? prev.filter((id) => id !== propertyId) // 移除
+            : [...prev, propertyId]; // 添加
+        });
+        console.log(
+          `Property ${propertyId} ${
+            isFavorited ? "removed from" : "added to"
+          } favourites.`
+        );
+      } else {
+        throw new Error("Failed to update favourite status");
+      }
+    } catch (error) {
+      console.error("Error updating favourite:", error);
+    }
+  };
+
   // Price range
   const [allListings, setAllListings] = useState([]);
   const [displayedListings, setDisplayedListings] = useState([]);
@@ -661,11 +720,26 @@ function App() {
               ) : displayedListings.length > 0 ? (
                 <Grid container spacing={2} sx={{ padding: 2 }}>
                   {currentListings.map((listing, index) => (
+                    // <ListingCard
+                    //   key={index}
+                    //   listing={listing}
+                    //   isAdmin={isAdmin}
+                    //   onEdit={handleEditListing}
+                    //   isFavorited={favourites.includes(listing.propertyID)}
+                    //   onFavouriteClick={(shouldFavourite) =>
+                    //     handleToggleFavourite(
+                    //       listing.propertyID,
+                    //       shouldFavourite
+                    //     )
+                    //   }
+                    // />
                     <ListingCard
                       key={index}
                       listing={listing}
                       isAdmin={isAdmin}
                       onEdit={handleEditListing}
+                      isFavorited={favourites.includes(listing.propertyID)}
+                      toggleFavourite={handleToggleFavourite}
                     />
                   ))}
                 </Grid>
@@ -699,7 +773,6 @@ function App() {
             open={isEditing}
             onClose={() => {
               handleCloseEdit();
-              handleBoundsChange();
             }}
             listing={editingListing}
             onSave={(updatedListing) => {
