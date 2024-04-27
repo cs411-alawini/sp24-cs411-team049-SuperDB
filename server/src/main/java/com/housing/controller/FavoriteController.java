@@ -4,10 +4,9 @@ import com.housing.service.FavoriteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -23,5 +22,19 @@ public class FavoriteController {
             @RequestParam Long propertyId) {
         favoriteService.addFavorite(userId, propertyId);
         return ResponseEntity.ok("OK");
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<String> removeFavorite(
+            @RequestParam int userId,
+            @RequestParam Long propertyId) {
+        favoriteService.removeFavorite(userId, propertyId);
+        return ResponseEntity.ok("OK");
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<List<Long>> getFavorites(@RequestParam int userId) {
+        List<Long> propertyIds = favoriteService.getFavorites(userId);
+        return ResponseEntity.ok(propertyIds);
     }
 }
