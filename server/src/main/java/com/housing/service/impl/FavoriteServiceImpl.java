@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class FavoriteServiceImpl implements FavoriteService {
@@ -43,4 +45,14 @@ public class FavoriteServiceImpl implements FavoriteService {
             }
         }
     }
+        @Override
+        @Transactional
+        public void removeFavorite(int userId, Long propertyId) {
+            favoriteMapper.removeFavorite(userId, propertyId);
+        }
+
+        @Override
+        public List<Long> getFavorites(int userId) {
+            return favoriteMapper.findPropertyIdsByUserId(userId);
+        }
 }
