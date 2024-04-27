@@ -61,6 +61,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .forEach(f -> propertyMapper.deleteFloorPlanById(f.getFloorPlanID()));
 
         for (FloorPlanEntity incomingFloorPlan : propertyModel.getFloorPlans()) {
+            incomingFloorPlan.setPropertyID(propertyModel.getPropertyID());
             Optional<FloorPlanEntity> existingPlan = existingFloorPlans.stream()
                     .filter(f -> f.getFloorPlanID().equals(incomingFloorPlan.getFloorPlanID()))
                     .findFirst();
