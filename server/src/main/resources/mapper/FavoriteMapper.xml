@@ -6,7 +6,7 @@
         CALL AddToFavorites(#{propertyID}, #{userID})
     </insert>
 
-    <delete id="deleteFavorite" parameterType="map">
+    <delete id="removeFavorite" parameterType="map">
         DELETE FROM Favorites WHERE userID = #{userId} AND propertyID = #{propertyId}
     </delete>
 
