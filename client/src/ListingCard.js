@@ -12,22 +12,34 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCat, faDog } from "@fortawesome/free-solid-svg-icons";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import EditIcon from "@mui/icons-material/Edit";
 import Rating from "@mui/material/Rating";
 
-export function ListingCard({ listing, isAdmin, onEdit }) {
+export function ListingCard({
+  listing,
+  isAdmin,
+  onEdit,
+  isFavorited,
+  toggleFavourite,
+  updateRating,
+}) {
+  // 处理点击收藏/取消收藏图标
+  const handleFavouriteClick = () => {
+    toggleFavourite(listing.propertyID, isFavorited); // 传递当前物业ID和新的收藏状态
+  };
   // 猫猫狗狗
   const getPetsAllowedIcons = (petsAllowed) => {
     if (!petsAllowed || petsAllowed === "null") {
-      return null; // 如果 petsAllowed 是 "null" 或未定义，则不显示任何图标
+      return null;
     }
     const icons = [];
     if (petsAllowed.includes("Dogs")) {
-      icons.push(<FontAwesomeIcon key="dog-icon" icon={faDog} />); // 添加狗狗图标
+      icons.push(<FontAwesomeIcon key="dog-icon" icon={faDog} />);
     }
     if (petsAllowed.includes("Cats")) {
-      icons.push(<FontAwesomeIcon key="cat-icon" icon={faCat} />); // 添加猫猫图标
+      icons.push(<FontAwesomeIcon key="cat-icon" icon={faCat} />);
     }
     return <Box display="flex">{icons}</Box>;
   };
@@ -45,12 +57,17 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
       setRating(score); // 将获取的评分设置到状态中
     } catch (error) {
       console.error("Failed to fetch rating:", error);
-      // 处理错误情况
     }
   };
   useEffect(() => {
     fetchRating(listing.propertyID); // 获取当前房源的评分
   }, [listing.propertyID]); // 当 listing.id 变化时重新获取评分
+
+  const handleRatingChange = async (newRating) => {
+    setRating(newRating);
+    await updateRating(listing.propertyID, newRating);
+  };
+
   // 解构必要的属性
   const { propertyID, title, address, source, floorPlans } = listing;
 
@@ -80,11 +97,6 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
 
   // 获取价格范围描述
   const priceRange = getPriceRange(floorPlans);
-
-  const handleFavouriteClick = () => {
-    // 这里你可以添加逻辑来更新用户的收藏状态
-    console.log(`${title} is favourited:`);
-  };
 
   const handleEditClick = () => {
     console.log("Editing listing:", listing);
@@ -117,8 +129,11 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
               {title}
             </Typography>
             <IconButton onClick={handleFavouriteClick}>
-              {/* Dummy icon */}
-              <FavoriteBorderIcon color={false ? "error" : "action"} />
+              {isFavorited ? (
+                <FavoriteIcon color="error" />
+              ) : (
+                <FavoriteBorderIcon />
+              )}
             </IconButton>
           </Box>
           <Typography variant="body2" color="text.secondary">
@@ -131,7 +146,15 @@ export function ListingCard({ listing, isAdmin, onEdit }) {
             mb={2}
             justifyContent="space-between" // 这将确保评分在左侧，图标在右侧
           >
-            <Rating value={rating} readOnly />
+            <Rating
+              value={rating}
+              onChange={(event, newValue) => {
+                if (isAdmin) {
+                  handleRatingChange(newValue);
+                }
+              }}
+              readOnly={!isAdmin}
+            />
             <Box flexGrow={1} /> {/* 这将推动宠物图标到右侧 */}
             {getPetsAllowedIcons(floorPlans[0].petsAllowed)}
           </Box>

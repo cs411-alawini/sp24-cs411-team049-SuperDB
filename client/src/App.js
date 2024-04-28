@@ -48,6 +48,27 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  // Rating
+  const updateRating = async (propertyId, newRating) => {
+    try {
+      const url = `/housing/ratings/score/update?propertyId=${propertyId}`;
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newRating),
+      });
+      if (response.ok) {
+        console.log("Rating updated successfully");
+      } else {
+        throw new Error("Failed to update rating");
+      }
+    } catch (error) {
+      console.error("Error updating rating:", error);
+    }
+  };
+
   // Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -130,6 +151,65 @@ function App() {
     };
     setEditingListing(newListing); // 设置新列表数据
     setIsEditing(true); // 打开编辑表单
+  };
+
+  // Favourites
+  const [favourites, setFavourites] = useState([]);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  useEffect(() => {
+    if (user && user.userID) {
+      const fetchFavourites = async () => {
+        try {
+          const response = await fetch(
+            `/housing/favorites/get?userId=${user.userID}`
+          );
+          const data = await response.json();
+          setFavourites(data || []);
+        } catch (error) {
+          console.error("Failed to fetch favourites:", error);
+        }
+      };
+
+      fetchFavourites();
+    }
+  }, [user]);
+
+  const handleToggleFavourite = async (propertyId, isFavorited) => {
+    const url = isFavorited
+      ? "/housing/favorites/remove"
+      : "/housing/favorites/add";
+    const method = isFavorited ? "DELETE" : "POST";
+    const body = new URLSearchParams();
+    body.append("userId", user.userID);
+    body.append("propertyId", propertyId);
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: body,
+      });
+
+      if (response.ok) {
+        setFavourites((prev) => {
+          return isFavorited
+            ? prev.filter((id) => id !== propertyId) // 移除
+            : [...prev, propertyId]; // 添加
+        });
+        console.log(
+          `Property ${propertyId} ${
+            isFavorited ? "removed from" : "added to"
+          } favourites.`
+        );
+      } else {
+        throw new Error("Failed to update favourite status");
+      }
+    } catch (error) {
+      console.error("Error updating favourite:", error);
+    }
   };
 
   // Price range
@@ -666,6 +746,9 @@ function App() {
                       listing={listing}
                       isAdmin={isAdmin}
                       onEdit={handleEditListing}
+                      isFavorited={favourites.includes(listing.propertyID)}
+                      toggleFavourite={handleToggleFavourite}
+                      updateRating={updateRating}
                     />
                   ))}
                 </Grid>
@@ -699,7 +782,6 @@ function App() {
             open={isEditing}
             onClose={() => {
               handleCloseEdit();
-              handleBoundsChange();
             }}
             listing={editingListing}
             onSave={(updatedListing) => {
