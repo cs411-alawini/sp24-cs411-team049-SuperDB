@@ -28,7 +28,7 @@ public class FloorPlanEntity {
 
     private BigDecimal fee;
 
-    private Boolean hasPhoto;
+    private String hasPhoto;
 
     private String petsAllowed;
 

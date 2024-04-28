@@ -37,12 +37,13 @@
     </select>
 
     <select id="findAllPropertiesWithFloorPlans" parameterType="map" resultMap="propertyResultMap">
-        SELECT p.*, fp.*
+        SELECT p.*, GROUP_CONCAT(CONCAT(fp.floorPlanID, ',', fp.bedrooms, ',', fp.bathrooms, ',', fp.squareFeet, ',', fp.price, ',', fp.currency, ',', fp.fee, ',', fp.hasPhoto, ',', fp.petsAllowed)) AS floorPlansInfo
         FROM Property p
         LEFT JOIN FloorPlan fp ON p.propertyID = fp.propertyID
         WHERE p.Latitude BETWEEN #{minLatitude} AND #{maxLatitude}
         AND p.Longitude BETWEEN #{minLongitude} AND #{maxLongitude}
         AND (#{title} IS NULL OR p.title LIKE CONCAT('%', #{title}, '%'))
+        GROUP BY p.propertyID
         LIMIT 100
     </select>
 
