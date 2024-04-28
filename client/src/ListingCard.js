@@ -10,10 +10,13 @@ import {
   CardActions,
   IconButton,
 } from "@mui/material";
+import SwipeableViews from "react-swipeable-views";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCat, faDog } from "@fortawesome/free-solid-svg-icons";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import EditIcon from "@mui/icons-material/Edit";
 import Rating from "@mui/material/Rating";
 
@@ -25,6 +28,30 @@ export function ListingCard({
   toggleFavourite,
   updateRating,
 }) {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const images = listing.floorPlans.map((plan) =>
+    plan.hasPhoto && plan.hasPhoto.startsWith("http")
+      ? plan.hasPhoto
+      : `${process.env.PUBLIC_URL}/images/default.png`
+  );
+  const uniqueImages = Array.from(new Set(images));
+  const maxSteps = uniqueImages.length;
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => (prevActiveStep + 1) % maxSteps);
+  };
+
+  const handleBack = () => {
+    setActiveStep(
+      (prevActiveStep) => (prevActiveStep - 1 + maxSteps) % maxSteps
+    );
+  };
+
+  const handleStepChange = (step) => {
+    setActiveStep(step);
+  };
+
   // 处理点击收藏/取消收藏图标
   const handleFavouriteClick = () => {
     toggleFavourite(listing.propertyID, isFavorited); // 传递当前物业ID和新的收藏状态
@@ -106,19 +133,60 @@ export function ListingCard({
   // 默认图片地址
   const defaultImageUrl = `${process.env.PUBLIC_URL}/images/default.png`;
   const mediaStyle = {
-    height: 200, // Adjust this value to change the image height
+    height: 200,
   };
 
   return (
     <Grid item xs={12} sm={6} md={6}>
       <Card sx={{ maxWidth: 345, m: 2 }}>
-        <CardMedia
-          component="img"
-          height="140"
-          image={defaultImageUrl}
-          sx={mediaStyle}
-          alt="Apartment"
-        />
+        <Box sx={{ position: "relative" }}>
+          <SwipeableViews
+            axis={"x"}
+            index={activeStep}
+            onChangeIndex={handleStepChange}
+            enableMouseEvents
+          >
+            {uniqueImages.map((img, index) => (
+              <CardMedia
+                key={index}
+                component="img"
+                sx={{ height: 200, display: "block", width: "100%" }}
+                image={img}
+                alt={`Apartment Image ${index + 1}`}
+              />
+            ))}
+          </SwipeableViews>
+          {maxSteps > 1 && (
+            <React.Fragment>
+              <IconButton
+                size="small"
+                sx={{
+                  position: "absolute",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  backgroundColor: "rgba(255,255,255,0.7)",
+                }}
+                onClick={handleBack}
+              >
+                <ArrowBackIosNewIcon />
+              </IconButton>
+              <IconButton
+                size="small"
+                sx={{
+                  position: "absolute",
+                  right: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  backgroundColor: "rgba(255,255,255,0.7)",
+                }}
+                onClick={handleNext}
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            </React.Fragment>
+          )}
+        </Box>
         <CardContent>
           <Box
             display="flex"
