@@ -7,6 +7,7 @@ import com.housing.mapper.PropertyMapper;
 import com.housing.service.PropertyService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,11 @@ public class PropertyServiceImpl implements PropertyService {
     @Transactional
     public void createProperty(PropertyModel propertyModel) {
         PropertyEntity propertyEntity = createPropertyEntity(propertyModel);
-        propertyMapper.insertProperty(propertyEntity);
+        try {
+            propertyMapper.insertProperty(propertyEntity);
+        } catch (DataAccessException ex) {
+            handleContactNumberException(ex);
+        }
 
         Long propertyID = propertyEntity.getPropertyID();
 
@@ -50,7 +55,11 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyEntity propertyEntity = propertyMapper.getPropertyById(propertyModel.getPropertyID());
         if (propertyEntity != null) {
             BeanUtils.copyProperties(propertyModel, propertyEntity);
-            propertyMapper.updateProperty(propertyEntity);
+            try {
+                propertyMapper.updateProperty(propertyEntity);
+            } catch (DataAccessException ex) {
+                handleContactNumberException(ex);
+            }
         } else {
             throw new IllegalStateException("No property found with ID: " + propertyModel.getPropertyID());
         }
@@ -80,6 +89,15 @@ public class PropertyServiceImpl implements PropertyService {
                 propertyMapper.insertFloorPlan(incomingFloorPlan);
             }
         }
+    }
+
+    private void handleContactNumberException(DataAccessException ex) {
+        Throwable rootCause = ex.getMostSpecificCause();
+        if (rootCause.getMessage().contains("Contact number must be exactly 10 digits") ||
+                rootCause.getMessage().contains("The first digit of the contact number must be between 2 and 9")) {
+            throw new IllegalArgumentException(rootCause.getMessage());
+        }
+        throw ex;
     }
 
 
