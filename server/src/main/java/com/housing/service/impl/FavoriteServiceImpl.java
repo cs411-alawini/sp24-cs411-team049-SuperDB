@@ -28,21 +28,15 @@ public class FavoriteServiceImpl implements FavoriteService {
         FavoriteEntity favorite = new FavoriteEntity();
         favorite.setUserID(userId);
         favorite.setPropertyID(propertyId);
-        // favorite.setPriceAtFavTime(BigDecimal.ZERO);
-        // favorite.setFavTime(new Date());
 
         try {
             favoriteMapper.insertFavorite(favorite);
-        } catch (DataAccessException e) {
-            Throwable rootCause = e.getMostSpecificCause();
-            if (rootCause instanceof SQLException) {
-                SQLException sqlEx = (SQLException) rootCause;
-                DataAccessException translatedEx = sqlExceptionTranslator.translate("Insert favorite", null, sqlEx);
-                System.err.println("Translated exception: " + translatedEx.getMessage());
-                throw translatedEx;
-            } else {
-                System.err.println("Data access error occurred: " + rootCause.getMessage());
+        } catch (DataAccessException ex) {
+            Throwable rootCause = ex.getMostSpecificCause();
+            if (rootCause.getMessage().contains("Failed to add to favorites: Listing is not available")) {
+                throw new IllegalArgumentException(rootCause.getMessage());
             }
+            throw ex;
         }
     }
         @Override

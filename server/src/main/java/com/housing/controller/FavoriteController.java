@@ -3,6 +3,7 @@ package com.housing.controller;
 import com.housing.service.FavoriteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,15 @@ public class FavoriteController {
     private FavoriteService favoriteService;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addFavorite(
-            @RequestParam int userId,
-            @RequestParam Long propertyId) {
-        favoriteService.addFavorite(userId, propertyId);
-        return ResponseEntity.ok("OK");
+    public ResponseEntity<?> addFavorite(@RequestParam int userId, @RequestParam Long propertyId) {
+        try {
+            favoriteService.addFavorite(userId, propertyId);
+            return ResponseEntity.ok("OK");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occurred while processing your request.");
+        }
     }
 
     @DeleteMapping("/remove")
