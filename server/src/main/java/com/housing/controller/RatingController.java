@@ -32,17 +32,11 @@ public class RatingController {
 
     @PutMapping("/score/update")
     public ResponseEntity<?> updateScoreByPropertyId(@RequestParam Long propertyId, @RequestBody BigDecimal score) {
-        try {
-            boolean updated = ratingService.changeRatingScore(propertyId, score);
-            if (updated) {
-                return ResponseEntity.ok("OK");
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating the score");
+        boolean updated = ratingService.changeRatingScore(propertyId, score);
+        if (updated) {
+            return ResponseEntity.ok("OK");
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }
