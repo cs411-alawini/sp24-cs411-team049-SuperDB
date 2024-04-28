@@ -5,6 +5,7 @@ import com.housing.service.ListingService;
 import com.housing.service.RatingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,11 +32,17 @@ public class RatingController {
 
     @PutMapping("/score/update")
     public ResponseEntity<?> updateScoreByPropertyId(@RequestParam Long propertyId, @RequestBody BigDecimal score) {
-        boolean updated = ratingService.changeRatingScore(propertyId, score);
-        if (updated) {
-            return ResponseEntity.ok("OK");
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            boolean updated = ratingService.changeRatingScore(propertyId, score);
+            if (updated) {
+                return ResponseEntity.ok("OK");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating the score");
         }
     }
 }
