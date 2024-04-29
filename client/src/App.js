@@ -193,7 +193,8 @@ function App() {
         body: body,
       });
 
-      if (response.ok) {
+      const result = await response.text();
+      if (result === "OK") {
         setFavourites((prev) => {
           return isFavorited
             ? prev.filter((id) => id !== propertyId) // 移除
@@ -205,7 +206,10 @@ function App() {
           } favourites.`
         );
       } else {
-        throw new Error("Failed to update favourite status");
+        handleSnackbarOpen(result, "error");
+        setTimeout(() => {
+          setSnackbarOpen(false);
+        }, 3000);
       }
     } catch (error) {
       console.error("Error updating favourite:", error);
