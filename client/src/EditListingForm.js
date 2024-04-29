@@ -177,16 +177,17 @@ export function EditListingForm({
       const response = await fetch(url, requestOptions);
       const result = await response.text();
       if (result !== "OK") {
-        throw new Error(`Server responded with an error: ${result}`);
-      }
-      console.log("Submission successful:", result);
-      if (isAdding) {
-        onSnackbarOpen("Property added successfully!", "success");
+        onSnackbarOpen(result, "error");
       } else {
-        onSnackbarOpen("Property updated successfully!", "success");
+        console.log("Submission successful:", result);
+        if (isAdding) {
+          onSnackbarOpen("Property added successfully!", "success");
+        } else {
+          onSnackbarOpen("Property updated successfully!", "success");
+        }
+        onSave(formData);
+        onClose();
       }
-      onSave(formData);
-      onClose();
     } catch (error) {
       console.error("Failed to submit listing:", error);
       if (isAdding) {
