@@ -48,6 +48,10 @@ const defaultCenter = {
 const addressCache = {};
 
 function App() {
+  useEffect(() => {
+    document.title = "NextHousing";
+  }, []);
+
   // Rating
   const updateRating = async (propertyId, newRating) => {
     try {
