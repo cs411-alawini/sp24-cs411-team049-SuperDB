@@ -370,6 +370,19 @@ function App() {
 
   const onLoad = (map) => {
     mapRef.current = map;
+    window.setMapCenter = setMapCenter;
+  };
+
+  const setMapCenter = (latitude, longitude) => {
+    if (!mapRef.current) {
+      console.log("Map is not loaded yet.");
+      return;
+    }
+    const newCenter = {
+      lat: parseFloat(latitude),
+      lng: parseFloat(longitude),
+    };
+    mapRef.current.setCenter(newCenter);
   };
 
   const onUnmount = () => {
