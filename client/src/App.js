@@ -133,7 +133,7 @@ function App() {
     console.log("User Logged In:", userData);
     console.log("Is Admin on login:", userData.userID === 1003);
     if (userData && userData.userID) {
-        fetchPropertyInsights(userData.userID, bounds);
+      fetchPropertyInsights(userData.userID, bounds);
     }
   };
 
@@ -142,7 +142,7 @@ function App() {
     setUser(null);
     console.log("User Logged Out");
     // force refresh
-    window.location.reload(); 
+    window.location.reload();
   };
 
   // Admin
@@ -394,6 +394,21 @@ function App() {
     };
     mapRef.current.setCenter(newCenter);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.keyCode === 192) {
+        event.preventDefault();
+        setMapCenter(37.7749, -122.4194);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const onUnmount = () => {
     mapRef.current = null;
