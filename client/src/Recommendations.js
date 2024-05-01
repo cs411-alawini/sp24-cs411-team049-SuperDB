@@ -39,7 +39,7 @@ const Recommendations = ({ insights, onClose }) => {
           margin: '10px',
           backgroundColor: '#fff'
         }}>
-          <img src={insight.imageUrl || defaultImageUrl} alt={insight.propertyName || 'Property'} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+          <img src={defaultImageUrl} alt={insight.propertyName || 'Property'} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
           <div style={{ padding: '10px' }}>
             <h3>{insight.propertyName || 'Unknown Property'}</h3>
             <p>{insight.description || 'No description available.'}</p>

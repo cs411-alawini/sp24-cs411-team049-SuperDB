@@ -27,9 +27,14 @@ public class PropertyInsightController {
             @RequestParam double minLongitude,
             @RequestParam double maxLongitude) {
         System.out.println("Fetching property insights for user ID: " + userId);
+        System.out.println("Geographical bounds - Min Latitude: " + minLatitude + ", Max Latitude: " + maxLatitude
+                + ", Min Longitude: " + minLongitude + ", Max Longitude: " + maxLongitude);
+
         List<PropertyInsight> insights = propertyInsightService.getPropertyInsightsByUserIdAndLocation(userId,
                 minLatitude,
-                maxLatitude, minLongitude, maxLongitude);
+                maxLatitude,
+                minLongitude,
+                maxLongitude);
         if (insights.isEmpty()) {
             System.out.println("No insights found for user ID: " + userId);
         } else {

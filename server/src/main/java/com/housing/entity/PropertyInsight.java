@@ -28,6 +28,4 @@ public class PropertyInsight {
     @Column(nullable = true, length = 500)
     private String description;
 
-    @Column(nullable = true, length = 255)
-    private String imageUrl;
 }
