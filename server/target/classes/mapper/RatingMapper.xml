@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.housing.mapper.RatingMapper">
+
+    <select id="findScoreByPropertyId" parameterType="long" resultType="java.math.BigDecimal">
+        SELECT score FROM Rating WHERE propertyID = #{propertyId}
+    </select>
+
+    <update id="updateScoreByPropertyId">
+        UPDATE Rating SET score = #{Score}
+        WHERE propertyID = #{propertyId}
+    </update>
+
+</mapper>
