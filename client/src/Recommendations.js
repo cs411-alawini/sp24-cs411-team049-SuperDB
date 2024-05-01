@@ -44,13 +44,6 @@ const Recommendations = ({ insights, onClose }) => {
             <h3>{insight.propertyName || 'Unknown Property'}</h3>
             <p>{insight.description || 'No description available.'}</p>
             <p><b>{insight.insight || 'No specific insights available.'}</b></p>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => window.location.href = `/properties/${insight.propertyID}`}
-            >
-              View Property
-            </Button>
           </div>
         </Card>
       ))}

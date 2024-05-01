@@ -132,6 +132,9 @@ function App() {
     localStorage.setItem("user", JSON.stringify(userData));
     console.log("User Logged In:", userData);
     console.log("Is Admin on login:", userData.userID === 1003);
+    if (userData && userData.userID) {
+        fetchPropertyInsights(userData.userID, bounds);
+    }
   };
 
   const handleLogout = () => {
