@@ -496,9 +496,10 @@ function App() {
   };
 
   const [propertyInsights, setPropertyInsights] = useState([]);
-  const fetchPropertyInsights = async (userId) => {
+  const fetchPropertyInsights = async (userId, bounds) => {
     try {
-      const response = await fetch(`/housing/property-insights/${userId}`);
+      const url = `/housing/property-insights/${userId}?minLatitude=${bounds.minLatitude}&maxLatitude=${bounds.maxLatitude}&minLongitude=${bounds.minLongitude}&maxLongitude=${bounds.maxLongitude}`;
+      const response = await fetch(url);
       console.log("Fetching Property Insights for userID:", userId);
       const data = await response.json();
       console.log("Property Insights Data:", data);
@@ -509,7 +510,7 @@ function App() {
   };
   useEffect(() => {
     if (user && user.userID) {
-      fetchPropertyInsights(user.userID);
+      fetchPropertyInsights(user.userID, bounds);
     }
   }, [user]);
 

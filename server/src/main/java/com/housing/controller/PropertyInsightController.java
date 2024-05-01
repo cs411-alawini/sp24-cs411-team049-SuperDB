@@ -21,9 +21,15 @@ public class PropertyInsightController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<PropertyInsight>> getPropertyInsightsByUserId(@PathVariable int userId) {
+    public ResponseEntity<List<PropertyInsight>> getPropertyInsightsByUserId(@PathVariable int userId,
+            @RequestParam double minLatitude,
+            @RequestParam double maxLatitude,
+            @RequestParam double minLongitude,
+            @RequestParam double maxLongitude) {
         System.out.println("Fetching property insights for user ID: " + userId);
-        List<PropertyInsight> insights = propertyInsightService.getPropertyInsightsByUserId(userId);
+        List<PropertyInsight> insights = propertyInsightService.getPropertyInsightsByUserIdAndLocation(userId,
+                minLatitude,
+                maxLatitude, minLongitude, maxLongitude);
         if (insights.isEmpty()) {
             System.out.println("No insights found for user ID: " + userId);
         } else {

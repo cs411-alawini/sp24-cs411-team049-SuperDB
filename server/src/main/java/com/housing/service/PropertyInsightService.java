@@ -12,7 +12,8 @@ public class PropertyInsightService {
     @Autowired
     private PropertyInsightsMapper propertyInsightsMapper;
 
-    public List<PropertyInsight> getPropertyInsightsByUserId(int userId) {
-        return propertyInsightsMapper.getPropertyInsightsByUserId(userId);
+    public List<PropertyInsight> getPropertyInsightsByUserIdAndLocation(int userId, double minLat, double maxLat,
+            double minLon, double maxLon) {
+        return propertyInsightsMapper.getPropertyInsightsByUserIdAndLocation(userId, minLat, maxLat, minLon, maxLon);
     }
 }

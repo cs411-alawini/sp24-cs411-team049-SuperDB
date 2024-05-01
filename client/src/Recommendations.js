@@ -2,7 +2,9 @@ import React from 'react';
 import { Card, Button } from '@material-ui/core';
 
 const Recommendations = ({ insights, onClose }) => {
-  return (
+    const defaultImageUrl = `${process.env.PUBLIC_URL}/images/default.png`;
+    
+    return (
     <div style={{
       position: 'fixed',
       top: '50%',
@@ -37,13 +39,7 @@ const Recommendations = ({ insights, onClose }) => {
           margin: '10px',
           backgroundColor: '#fff'
         }}>
-          {insight.imageUrl ? (
-            <img src={insight.imageUrl} alt={insight.propertyName || 'Property'} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ccc' }}>
-              No image available
-            </div>
-          )}
+          <img src={insight.imageUrl || defaultImageUrl} alt={insight.propertyName || 'Property'} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
           <div style={{ padding: '10px' }}>
             <h3>{insight.propertyName || 'Unknown Property'}</h3>
             <p>{insight.description || 'No description available.'}</p>

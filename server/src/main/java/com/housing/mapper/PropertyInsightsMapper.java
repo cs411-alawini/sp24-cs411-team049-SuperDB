@@ -8,5 +8,10 @@ import java.util.List;
 
 @Mapper
 public interface PropertyInsightsMapper {
-    List<PropertyInsight> getPropertyInsightsByUserId(@Param("userId") int userId);
+    List<PropertyInsight> getPropertyInsightsByUserIdAndLocation(
+            @Param("userId") int userId,
+            @Param("minLat") double minLat,
+            @Param("maxLat") double maxLat,
+            @Param("minLon") double minLon,
+            @Param("maxLon") double maxLon);
 }
