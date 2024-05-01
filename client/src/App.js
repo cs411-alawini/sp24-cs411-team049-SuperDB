@@ -141,6 +141,8 @@ function App() {
     localStorage.removeItem("user");
     setUser(null);
     console.log("User Logged Out");
+    // force refresh
+    window.location.reload(); 
   };
 
   // Admin
