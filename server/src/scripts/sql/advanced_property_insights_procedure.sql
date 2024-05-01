@@ -69,8 +69,10 @@ BEGIN
            r.AvgRating,
            CASE
                 WHEN r.AvgRating >= 4 AND f.FavoriteCount >= percentile75 THEN 'Highly recommended'
-                WHEN r.AvgRating >= 3.5 AND f.FavoriteCount >= percentile50 AND f.FavoriteCount < percentile75 THEN 'Popular'
+                WHEN r.AvgRating >= 3.5 AND f.FavoriteCount >= percentile75 THEN 'Popular'
+                WHEN r.AvgRating >= 3.5 AND f.FavoriteCount >= percentile50 AND f.FavoriteCount < percentile75 THEN 'Well-Liked'
                 WHEN r.AvgRating >= 3 AND f.FavoriteCount >= percentile25 AND f.FavoriteCount < percentile50 THEN 'Satisfactory'
+                WHEN r.AvgRating < 3 AND f.FavoriteCount >= percentile75 THEN 'Cult Favorites'
                 WHEN r.AvgRating < 3 THEN 'Needs review'
                 ELSE 'Moderately popular'
            END AS Insight,
