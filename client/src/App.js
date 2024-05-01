@@ -34,6 +34,7 @@ import { ListingCard } from "./ListingCard";
 import { mapStyles } from "./mapStyles";
 import { EditListingForm } from "./EditListingForm";
 import { Snackbar, Alert } from "@mui/material";
+import Recommendations from "./Recommendations";
 
 const containerStyle = {
   width: "100%",
@@ -484,6 +485,34 @@ function App() {
   // console.log("currentListings:", currentListings);
   const totalPages = Math.ceil(displayedListings.length / listingsPerPage);
 
+  // Property Insights
+  // Property Insights
+  // Property Insights
+  // Property Insights
+  // Function to fetch property insights
+  const [showRecommendations, setShowRecommendations] = useState(true);
+  const handleCloseRecommendations = () => {
+    setShowRecommendations(false);
+  };
+
+  const [propertyInsights, setPropertyInsights] = useState([]);
+  const fetchPropertyInsights = async (userId) => {
+    try {
+      const response = await fetch(`/housing/property-insights/${userId}`);
+      console.log("Fetching Property Insights for userID:", userId);
+      const data = await response.json();
+      console.log("Property Insights Data:", data);
+      setPropertyInsights(data);
+    } catch (error) {
+      console.error("Error fetching property insights:", error);
+    }
+  };
+  useEffect(() => {
+    if (user && user.userID) {
+      fetchPropertyInsights(user.userID);
+    }
+  }, [user]);
+
   return (
     <UserProvider>
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -513,6 +542,9 @@ function App() {
             )}
           </Toolbar>
         </AppBar>
+        {showRecommendations && propertyInsights.length > 0 && (
+          <Recommendations insights={propertyInsights} onClose={handleCloseRecommendations} />
+        )}
         <LoginDialog
           open={dialogOpen}
           onClose={handleDialogClose}
