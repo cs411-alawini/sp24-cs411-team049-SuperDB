@@ -181,6 +181,10 @@ function App() {
   }, [user]);
 
   const handleToggleFavourite = async (propertyId, isFavorited) => {
+    if (!user || !user.userID) {
+      handleSnackbarOpen("Please log in to manage favorites", "warning");
+      return;
+    }
     const url = isFavorited
       ? "/housing/favorites/remove"
       : "/housing/favorites/add";
@@ -544,7 +548,10 @@ function App() {
           </Toolbar>
         </AppBar>
         {showRecommendations && propertyInsights.length > 0 && (
-          <Recommendations insights={propertyInsights} onClose={handleCloseRecommendations} />
+          <Recommendations
+            insights={propertyInsights}
+            onClose={handleCloseRecommendations}
+          />
         )}
         <LoginDialog
           open={dialogOpen}
