@@ -46,6 +46,7 @@ export function EditListingForm({
         throw new Error(`Server responded with an error: ${result}`);
       }
       onSnackbarOpen("Property deleted successfully!", "success");
+      onSave(formData);
       onClose();
     } catch (error) {
       console.error("Failed to delete property:", error);
