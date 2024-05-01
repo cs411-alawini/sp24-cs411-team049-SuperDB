@@ -96,7 +96,7 @@ export function ListingCard({
   };
 
   // 解构必要的属性
-  const { propertyID, title, address, source, floorPlans } = listing;
+  const { propertyID, title, address, contactNumber, floorPlans } = listing;
 
   const getBedBathString = (floorPlans) => {
     if (floorPlans.length === 1) {
@@ -232,11 +232,15 @@ export function ListingCard({
           <Typography variant="body1">{priceRange}</Typography>
         </CardContent>
         <CardActions>
-          <Button size="small" color="primary">
+          <Button
+            size="small"
+            color="primary"
+            href="email:notice@nexthousing.com"
+          >
             Email Property
           </Button>
-          {source && (
-            <Button size="small" color="primary" href={`tel:${source}`}>
+          {contactNumber && (
+            <Button size="small" color="primary" href={`tel:${contactNumber}`}>
               Call
             </Button>
           )}

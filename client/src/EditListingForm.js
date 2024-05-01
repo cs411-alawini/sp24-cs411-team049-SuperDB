@@ -141,11 +141,14 @@ export function EditListingForm({
       ? `/housing/property/properties/create`
       : `/housing/property/properties/update/`;
 
+    const normalizedContactNumber = formData.contactNumber.replace(/-/g, "");
+    console.log("number:", normalizedContactNumber);
+
     const requestBody = {
       ...(isAdding ? {} : { propertyID: formData.propertyID }), // 添加时不包含 propertyID
       address: formData.address || "null",
       amenities: formData.amenities || "null",
-      contactNumber: formData.contactNumber || null,
+      contactNumber: normalizedContactNumber || null,
       latitude: formData.latitude,
       longitude: formData.longitude,
       source: formData.source || "admin",
