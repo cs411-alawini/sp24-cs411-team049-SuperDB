@@ -1,8 +1,10 @@
 package com.housing.service.impl;
 
+import com.housing.entity.ListingEntity;
 import com.housing.entity.PropertyEntity;
 import com.housing.entity.PropertyModel;
 import com.housing.entity.FloorPlanEntity;
+import com.housing.mapper.ListingMapper;
 import com.housing.mapper.PropertyMapper;
 import com.housing.service.PropertyService;
 import org.springframework.beans.BeanUtils;
@@ -22,6 +24,9 @@ public class PropertyServiceImpl implements PropertyService {
     @Autowired
     private PropertyMapper propertyMapper;
 
+    @Autowired
+    private ListingMapper listingMapper;
+
     @Override
     public List<PropertyModel> getPropertiesInRectangle(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude, String title) {
         return propertyMapper.findAllPropertiesWithFloorPlans(minLatitude, maxLatitude, minLongitude, maxLongitude, title);
@@ -39,6 +44,10 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         Long propertyID = propertyEntity.getPropertyID();
+
+        ListingEntity listing = new ListingEntity();
+        listing.setPropertyID(propertyID);
+        listingMapper.insertListing(listing);
 
         if (propertyModel.getFloorPlans() != null) {
             for (FloorPlanEntity floorPlan : propertyModel.getFloorPlans()) {

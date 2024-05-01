@@ -2,20 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.housing.mapper.ListingMapper">
 
-    <select id="findAvailableListingsWithHighRatings" resultType="com.housing.entity.ListingModel">
-        SELECT L.ListingID, L.PropertyID, L.AvailableDate, FP.Bedrooms, FP.Bathrooms, AR.AverageRating
-        FROM Listing L
-        JOIN Property P ON L.PropertyID = P.PropertyID
-        JOIN FloorPlan FP ON P.PropertyID = FP.PropertyID
-        JOIN (
-        SELECT R.PropertyID, AVG(R.Score) AS AverageRating
-        FROM Rating R
-        GROUP BY R.PropertyID
-        HAVING AVG(R.Score) > 4.0
-        ) AR ON P.PropertyID = AR.PropertyID
-        WHERE L.AvailableDate > CURRENT_DATE
-        ORDER BY AR.AverageRating DESC
-        LIMIT 15
-    </select>
+    <insert id="insertListing" parameterType="com.housing.entity.ListingEntity">
+        INSERT INTO Listing (PropertyID, AvailableDate, Description)
+        VALUES (#{propertyID}, DATE_ADD(CURRENT_DATE, INTERVAL 1 YEAR), #{description})
+    </insert>
 
 </mapper>
