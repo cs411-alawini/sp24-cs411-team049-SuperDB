@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.housing.mapper.PropertyInsightsMapper">
+
+    <select id="getPropertyInsightsByUserIdAndLocation" resultType="com.housing.entity.PropertyInsight">
+        CALL AdvancedPropertyInsights(
+            #{userId, jdbcType=INTEGER},
+            #{minLat, jdbcType=DECIMAL},
+            #{maxLat, jdbcType=DECIMAL},
+            #{minLon, jdbcType=DECIMAL},
+            #{maxLon, jdbcType=DECIMAL}
+        )
+    </select>
+
+</mapper>
