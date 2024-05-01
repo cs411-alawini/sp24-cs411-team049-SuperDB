@@ -20,14 +20,12 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserEntity> registerUser(@RequestBody UserEntity user) {
-        System.out.println("Received user: " + user);
         UserEntity registeredUser = userService.registerUser(user.getUsername(), user.getEmail(), user.getPassword());
         return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserEntity> loginUser(@RequestBody UserEntity user) {
-        System.out.println("Received user: " + user);
         UserEntity loggedInUser = userService.loginUser(user.getUsername(), user.getPassword());
         return ResponseEntity.ok(loggedInUser);
     }
