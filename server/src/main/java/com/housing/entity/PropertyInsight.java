@@ -1,67 +1,33 @@
 package com.housing.entity;
 
+import lombok.Data;
+
+import javax.persistence.*;
+
+@Data
+@Entity
+@Table(name = "PropertyInsight")
 public class PropertyInsight {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long propertyID;
+
+    @Column(nullable = false)
     private int favoriteCount;
+
+    @Column(nullable = false)
     private double avgRating;
+
+    @Column(nullable = true, length = 500)
     private String insight;
+
+    @Column(nullable = false, length = 100)
     private String propertyName;
+
+    @Column(nullable = true, length = 500)
     private String description;
+
+    @Column(nullable = true, length = 255)
     private String imageUrl;
-
-    public long getPropertyID() {
-        return propertyID;
-    }
-
-    public void setPropertyID(long propertyID) {
-        this.propertyID = propertyID;
-    }
-
-    public int getFavoriteCount() {
-        return favoriteCount;
-    }
-
-    public void setFavoriteCount(int favoriteCount) {
-        this.favoriteCount = favoriteCount;
-    }
-
-    public double getAvgRating() {
-        return avgRating;
-    }
-
-    public void setAvgRating(double avgRating) {
-        this.avgRating = avgRating;
-    }
-
-    public String getInsight() {
-        return insight;
-    }
-
-    public void setInsight(String insight) {
-        this.insight = insight;
-    }
-
-    public String getPropertyName() {
-        return propertyName;
-    }
-
-    public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 }
