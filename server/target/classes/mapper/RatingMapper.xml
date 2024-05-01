@@ -11,4 +11,9 @@
         WHERE propertyID = #{propertyId}
     </update>
 
+    <insert id="insertRating" parameterType="com.housing.entity.RatingEntity">
+        INSERT INTO Rating (RatingID, PropertyID, Score, Description)
+        VALUES (#{ratingID}, #{propertyID}, #{score}, #{description})
+    </insert>
+
 </mapper>

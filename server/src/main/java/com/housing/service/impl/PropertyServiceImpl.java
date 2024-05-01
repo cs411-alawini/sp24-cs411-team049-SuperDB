@@ -1,11 +1,9 @@
 package com.housing.service.impl;
 
-import com.housing.entity.ListingEntity;
-import com.housing.entity.PropertyEntity;
-import com.housing.entity.PropertyModel;
-import com.housing.entity.FloorPlanEntity;
+import com.housing.entity.*;
 import com.housing.mapper.ListingMapper;
 import com.housing.mapper.PropertyMapper;
+import com.housing.mapper.RatingMapper;
 import com.housing.service.PropertyService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +11,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +26,9 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Autowired
     private ListingMapper listingMapper;
+
+    @Autowired
+    private RatingMapper ratingMapper;
 
     @Override
     public List<PropertyModel> getPropertiesInRectangle(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude, String title) {
@@ -48,6 +51,14 @@ public class PropertyServiceImpl implements PropertyService {
         ListingEntity listing = new ListingEntity();
         listing.setPropertyID(propertyID);
         listingMapper.insertListing(listing);
+
+        int nextRatingId = ratingMapper.getMaxRatingId() + 1;
+        RatingEntity rating = new RatingEntity();
+        rating.setRatingID(nextRatingId);
+        rating.setPropertyID(propertyID);
+        rating.setScore(BigDecimal.ZERO);
+        rating.setDescription("");
+        ratingMapper.insertRating(rating);
 
         if (propertyModel.getFloorPlans() != null) {
             for (FloorPlanEntity floorPlan : propertyModel.getFloorPlans()) {
